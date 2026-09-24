@@ -1,0 +1,1593 @@
+We'll create a complete Software Requirements Specification (SRS) for CampusCare and use it as the master instruction document for Bolt AI. The document will describe exactly what the product should do, how users interact with it, what features it must include, and how we will validate the finished application.
+
+We'll let Bolt choose the technology stack, but we'll make sure the requirements clearly state that it must build a functional, full-stack application with a real database, working APIs, authentication, and business logic—not just a beautiful frontend with dummy data.
+
+I'll structure the SRS so you can copy it directly into Bolt and use it as the foundation for the entire project.
+
+SOFTWARE REQUIREMENTS SPECIFICATION (SRS)
+CampusCare
+
+Student Support & Ticket Management System
+
+Pre-Drive Product Engineering Assignment · Assignment 4
+
+Document Version: 1.0
+
+Prepared for: Edumerge Solutions Recruitment Assessment
+
+Project Type: Full-Stack Web Application
+
+Target: Functional, responsive, demonstrable prototype
+
+1. Project Overview
+1.1 Project purpose
+
+CampusCare is a centralized student support and administrative ticket management platform designed for colleges and educational institutions.
+
+The platform enables students to raise requests related to fees, attendance, ID cards, documents, certificates, and other administrative matters. Support staff can manage, prioritize, assign, process, and resolve these requests, while administrators can monitor operational performance, staff workload, ticket ageing, and SLA compliance.
+
+The system aims to replace scattered communication through emails, phone calls, and in-person visits with a structured, transparent, and traceable support process.
+
+1.2 Problem statement
+
+Educational institutions receive a large number of student requests across multiple departments. When these requests are handled manually, several problems can occur:
+
+Requests may be lost or overlooked.
+
+Students may not know the current status of their requests.
+
+Staff may not have clear ownership of pending issues.
+
+Urgent requests may not receive timely attention.
+
+Managers may lack visibility into overdue tickets and staff workloads.
+
+There may be no reliable history of actions taken to resolve a request.
+
+CampusCare addresses these problems through centralized ticket management, role-based access, workflow automation, SLA tracking, and operational reporting.
+
+1.3 Project objectives
+
+Provide students with a simple interface to raise and track support requests.
+
+Enable staff to manage tickets with clear ownership and status tracking.
+
+Help managers monitor workloads, pending requests, and overdue tickets.
+
+Maintain a reliable history of ticket actions and status changes.
+
+Provide meaningful dashboards and reports for operational decision-making.
+
+Ensure secure access, data consistency, and a responsive user experience.
+
+1.4 Scope
+
+The application will include:
+
+Authentication and role-based access control.
+
+Student support portal.
+
+Staff ticket management workspace.
+
+Admin and manager dashboard.
+
+Ticket creation, assignment, prioritization, and resolution.
+
+Comments, internal notes, and activity history.
+
+SLA monitoring and escalation indicators.
+
+Notifications and reporting.
+
+Search, filtering, sorting, and pagination.
+
+Demo data and test accounts.
+
+The initial version will focus on a single institution with multiple departments and support categories. Multi-institution tenancy, real email/SMS delivery, and external college ERP integration are outside the initial scope.
+
+2. User Roles and Permissions
+
+The system must support three primary roles.
+
+2.1 Student
+
+Students can:
+
+Log in securely.
+
+Create support tickets.
+
+Select a category, subject, description, and priority.
+
+View their own tickets and current status.
+
+Reply to staff requests for additional information.
+
+View public comments and ticket activity.
+
+Receive notifications about ticket updates.
+
+Reopen eligible resolved tickets.
+
+View their personal ticket history.
+
+Students must not be able to view another student's tickets, staff-only notes, or administrative information.
+
+2.2 Support Staff
+
+Support staff can:
+
+View tickets assigned to them.
+
+View tickets in their department if authorized.
+
+Accept or begin work on assigned tickets.
+
+Update ticket status and priority within their permissions.
+
+Add public replies and private internal notes.
+
+Request additional information from students.
+
+Resolve tickets with a resolution summary.
+
+View ticket history and SLA deadlines.
+
+View their own workload and pending tasks.
+
+Staff must not be able to modify user roles, access restricted administrative settings, or change another department's tickets without authorization.
+
+2.3 Admin / Manager
+
+Administrators and managers can:
+
+View all tickets across authorized departments.
+
+Assign and reassign tickets to staff.
+
+Change priority and manage ticket status.
+
+Manage staff accounts and department membership.
+
+View organization-wide dashboard metrics.
+
+Monitor SLA breaches, ageing, and pending tickets.
+
+Access reports and export ticket data.
+
+Configure ticket categories and SLA policies.
+
+Review ticket activity and audit history.
+
+Administrative actions must be recorded in the audit trail.
+
+3. Functional Requirements
+3.1 Authentication and user management
+
+FR-001 — User login
+
+The system must provide a secure login screen with email or username and password.
+
+FR-002 — Role-based redirection
+
+After login, users must be redirected to the appropriate dashboard based on their role.
+
+FR-003 — User registration
+
+Students may register using the institution's approved registration process. For the prototype, administrators may also create demo accounts.
+
+FR-004 — Session management
+
+The system must maintain authenticated sessions securely and provide logout functionality.
+
+FR-005 — User profile
+
+Users must be able to view their profile information, including name, email, role, department, and student or employee identifier where applicable.
+
+FR-006 — Access control
+
+All restricted actions must be validated on the server. Hiding buttons in the UI alone is insufficient.
+
+3.2 Ticket creation and management
+
+FR-007 — Create ticket
+
+Students must be able to submit a ticket with:
+
+Category.
+
+Subject.
+
+Detailed description.
+
+Priority.
+
+Optional attachment, if supported.
+
+The system must validate required fields before accepting the request.
+
+FR-008 — Unique ticket number
+
+Each ticket must receive a unique, human-readable ticket number, such as CC-2026-00125.
+
+FR-009 — Ticket listing
+
+Users must see tickets according to their permissions:
+
+Students: their own tickets.
+
+Staff: assigned tickets and authorized department tickets.
+
+Admins: all tickets within their authorized scope.
+
+FR-010 — Ticket details
+
+The ticket details page must display the ticket number, requester, category, subject, description, priority, status, assigned staff member, creation date, last update, SLA deadlines, comments, and activity history.
+
+FR-011 — Ticket editing
+
+Authorized users may update editable ticket fields. The system must preserve the original creation date and record significant changes in the activity history.
+
+FR-012 — Search and filtering
+
+The ticket list must support:
+
+Search by ticket number, subject, or requester.
+
+Filter by status, category, priority, assignee, and SLA state.
+
+Sort by creation date, update date, priority, and deadline.
+
+Pagination for larger ticket lists.
+
+3.3 Assignment and ownership
+
+FR-013 — Manual assignment
+
+Admins and managers must be able to assign or reassign tickets to eligible staff members.
+
+FR-014 — Assignment validation
+
+A ticket may only be assigned to an active staff account authorized for the relevant department or category.
+
+FR-015 — Ownership visibility
+
+Each ticket must clearly display its current assignee and assignment status.
+
+FR-016 — Automatic assignment suggestion
+
+The system should suggest an eligible staff member based on category specialization and current open-ticket workload.
+
+This is a recommendation, not a mandatory automatic assignment. An authorized manager can override the suggestion.
+
+FR-017 — Reassignment history
+
+Every assignment or reassignment must be recorded with the previous assignee, new assignee, actor, and timestamp.
+
+3.4 Ticket status and lifecycle
+
+The system must support the following statuses:
+
+Status
+
+	
+
+Meaning
+
+
+
+
+Open
+
+	
+
+Request received and awaiting processing
+
+
+
+
+In Progress
+
+	
+
+Staff is actively working on the request
+
+
+
+
+Waiting for Student
+
+	
+
+Additional information is required from the student
+
+
+
+
+Resolved
+
+	
+
+Staff has completed the requested work
+
+
+
+
+Closed
+
+	
+
+Ticket is finalized
+
+FR-018 — Status transitions
+
+The system must validate status transitions according to role and current ticket state.
+
+FR-019 — Waiting for student
+
+When staff request additional information, the ticket must move to Waiting for Student and record the request.
+
+FR-020 — Student response
+
+When a student responds to a waiting ticket, the system must record the reply and allow the ticket to return to In Progress.
+
+FR-021 — Resolution summary
+
+Staff must provide a resolution summary before resolving a ticket.
+
+FR-022 — Closure
+
+A resolved ticket may be closed by an authorized user or automatically after a configurable closure period.
+
+FR-023 — Reopening
+
+A student may reopen an eligible resolved or recently closed ticket within a configurable reopening window. The system must record the reason and preserve the earlier resolution history.
+
+FR-024 — Invalid transitions
+
+Invalid transitions must be rejected with a clear error message and must not modify the ticket.
+
+3.5 Comments and communication
+
+FR-025 — Public comments
+
+Students and authorized staff may add public comments visible to the ticket participants.
+
+FR-026 — Internal notes
+
+Authorized staff and admins may add internal notes that are visible only to authorized staff.
+
+FR-027 — Comment history
+
+Comments must be displayed chronologically with the author, timestamp, and visibility type.
+
+FR-028 — Comment validation
+
+Empty comments must be rejected. The system must distinguish between a public reply and a private internal note.
+
+FR-029 — Communication notifications
+
+The system should notify relevant users when a new public reply, assignment, or significant status change occurs.
+
+3.6 SLA management
+
+FR-030 — SLA policies
+
+The system must support configurable response and resolution targets based on ticket priority.
+
+Initial default targets:
+
+Priority
+
+	
+
+First response target
+
+	
+
+Resolution target
+
+
+
+
+Low
+
+	
+
+24 hours
+
+	
+
+72 hours
+
+
+
+
+Medium
+
+	
+
+8 hours
+
+	
+
+48 hours
+
+
+
+
+High
+
+	
+
+2 hours
+
+	
+
+24 hours
+
+
+
+
+Urgent
+
+	
+
+30 minutes
+
+	
+
+4 hours
+
+These values are illustrative defaults and must be configurable by an administrator.
+
+FR-031 — SLA deadlines
+
+When a ticket is created, the system must calculate its first-response and resolution deadlines using the applicable SLA policy.
+
+FR-032 — First-response tracking
+
+The system must record when the first qualifying public staff response is made.
+
+FR-033 — SLA status
+
+Each ticket must display one of the following SLA states:
+
+On Track.
+
+Approaching Deadline.
+
+Overdue.
+
+Completed.
+
+FR-034 — Overdue detection
+
+Tickets past their applicable deadlines must be identifiable in ticket lists and dashboards.
+
+FR-035 — Priority changes
+
+When a ticket's priority changes, the system must recalculate its resolution deadline according to the defined policy and record the change.
+
+FR-036 — SLA pause rules
+
+For the prototype, resolution-time calculations may pause while a ticket is Waiting for Student. The system must clearly indicate whether this rule is enabled and apply it consistently.
+
+First-response deadlines must not be reset simply because the ticket is reassigned.
+
+3.7 Escalation and pending actions
+
+FR-037 — Approaching SLA deadline
+
+Tickets approaching their SLA deadline must be highlighted to staff and managers.
+
+FR-038 — Escalation indicator
+
+Overdue tickets must display a clear escalation indicator in the ticket list and dashboard.
+
+FR-039 — Pending-action ownership
+
+Each ticket must indicate whether the next action is expected from the student, staff, or manager.
+
+FR-040 — Escalation visibility
+
+Managers must be able to filter tickets by overdue state, time since last update, and pending-action owner.
+
+For the prototype, escalation may be implemented through in-app indicators rather than external notification integrations.
+
+3.8 Dashboard and analytics
+
+FR-041 — Admin dashboard
+
+The admin dashboard must display:
+
+Total tickets.
+
+Open tickets.
+
+In-progress tickets.
+
+Waiting-for-student tickets.
+
+Resolved and closed tickets.
+
+Overdue tickets.
+
+Average resolution time.
+
+SLA compliance rate.
+
+FR-042 — Ticket distribution
+
+The dashboard must show ticket distribution by status, category, and priority.
+
+FR-043 — Staff workload
+
+The dashboard must show open tickets assigned to each staff member and highlight unassigned or overloaded work.
+
+FR-044 — Ticket ageing
+
+The system must categorize pending tickets by age, such as under 24 hours, 1–3 days, 3–7 days, and over 7 days.
+
+FR-045 — Staff dashboard
+
+Staff must see their assigned tickets, pending tasks, approaching deadlines, and overdue tickets.
+
+FR-046 — Student dashboard
+
+Students must see their total tickets, active tickets, resolved tickets, and recent activity.
+
+FR-047 — Reports
+
+The system must provide reports for ticket volume, category distribution, status distribution, SLA compliance, and resolution time.
+
+FR-048 — Date filtering
+
+Dashboard metrics and reports should support date-range filtering.
+
+FR-049 — Export
+
+Admins should be able to export filtered ticket data as CSV.
+
+3.9 Notifications
+
+FR-050 — In-app notifications
+
+The system must support in-app notifications for:
+
+Ticket assignment.
+
+New public reply.
+
+Status changes.
+
+Ticket resolution.
+
+Reopening.
+
+Approaching or breached SLA deadlines.
+
+FR-051 — Notification center
+
+Users must be able to view notifications, mark them as read, and navigate to the associated ticket.
+
+FR-052 — Notification permissions
+
+Notifications must only reveal information the receiving user is authorized to access.
+
+External email, SMS, and WhatsApp delivery are outside the required initial scope.
+
+3.10 Administration
+
+FR-053 — Category management
+
+Admins must be able to manage ticket categories such as Fees, Attendance, ID Cards, Documents, Certificates, and General Support.
+
+FR-054 — SLA policy management
+
+Admins must be able to configure response and resolution targets for each priority.
+
+FR-055 — Staff management
+
+Admins must be able to view staff accounts, activate or deactivate accounts, and manage department membership.
+
+FR-056 — Audit history
+
+The system must preserve a traceable record of significant ticket and administrative actions.
+
+4. Ticket Workflow and Business Rules
+4.1 Primary ticket lifecycle
+4.2 Business rules
+
+BR-001: Every ticket must belong to one student requester.
+
+BR-002: Every ticket must have a unique ticket number.
+
+BR-003: A ticket must have a valid category, subject, description, priority, status, and creation timestamp.
+
+BR-004: Only authorized staff or admins may assign tickets.
+
+BR-005: Students may access only their own tickets.
+
+BR-006: Internal notes must never be exposed to students.
+
+BR-007: A ticket cannot be resolved without a resolution summary.
+
+BR-008: Closed tickets cannot be modified through normal workflow operations. Reopening must follow the defined reopening rules.
+
+BR-009: Every significant status, assignment, priority, and resolution change must create an audit record.
+
+BR-010: SLA deadlines must be calculated consistently and displayed in the user's local time zone.
+
+BR-011: Dashboard metrics must be derived from persisted data rather than hardcoded sample figures.
+
+BR-012: Failed operations must not leave partial or inconsistent database changes.
+
+5. Data Model Requirements
+
+The application must use a persistent relational database or an equivalent structured data store that supports relationships and data integrity.
+
+The following logical entities are required.
+
+5.1 Users
+
+Fields:
+
+id
+
+full_name
+
+email
+
+password_hash or managed authentication identifier
+
+role
+
+department_id
+
+student_or_employee_id
+
+is_active
+
+created_at
+
+updated_at
+
+5.2 Departments
+
+Fields:
+
+id
+
+name
+
+description
+
+is_active
+
+5.3 Tickets
+
+Fields:
+
+id
+
+ticket_number
+
+requester_id
+
+assigned_to_id
+
+department_id
+
+category_id
+
+subject
+
+description
+
+priority
+
+status
+
+resolution_summary
+
+next_action_owner
+
+first_response_due_at
+
+first_responded_at
+
+resolution_due_at
+
+resolved_at
+
+closed_at
+
+reopen_count
+
+created_at
+
+updated_at
+
+5.4 Ticket categories
+
+Fields:
+
+id
+
+name
+
+description
+
+department_id
+
+is_active
+
+5.5 Ticket comments
+
+Fields:
+
+id
+
+ticket_id
+
+author_id
+
+content
+
+visibility
+
+created_at
+
+updated_at
+
+The visibility field must distinguish between public replies and internal notes.
+
+5.6 Ticket history
+
+Fields:
+
+id
+
+ticket_id
+
+actor_id
+
+action_type
+
+old_value
+
+new_value
+
+description
+
+created_at
+
+5.7 SLA policies
+
+Fields:
+
+id
+
+priority
+
+first_response_minutes
+
+resolution_minutes
+
+pause_while_waiting
+
+is_active
+
+created_at
+
+updated_at
+
+5.8 Notifications
+
+Fields:
+
+id
+
+user_id
+
+ticket_id
+
+type
+
+message
+
+is_read
+
+created_at
+
+5.9 Data integrity requirements
+
+Primary keys and foreign keys must be configured.
+
+Ticket numbers must be unique.
+
+Required fields must be validated.
+
+Passwords must never be stored in plain text.
+
+Ticket history must be append-only for ordinary users.
+
+Ticket creation and its initial history record should be committed atomically.
+
+Appropriate indexes should be created for ticket number, status, priority, assignee, requester, and creation date.
+
+6. API Requirements
+
+The application must expose a clear API layer for frontend-to-backend communication.
+
+The following endpoints describe the required behavior. The selected framework may use different endpoint naming conventions, but equivalent functionality must be implemented.
+
+Module
+
+	
+
+Required API operations
+
+
+
+
+Authentication
+
+	
+
+Login, logout, current user, registration or demo-account setup
+
+
+
+
+Users
+
+	
+
+List users, get user, update profile, manage staff accounts
+
+
+
+
+Tickets
+
+	
+
+Create, list, retrieve, update, assign, change priority, change status, resolve, close, reopen
+
+
+
+
+Comments
+
+	
+
+List comments, add public reply, add internal note
+
+
+
+
+History
+
+	
+
+Retrieve ticket activity
+
+
+
+
+Dashboard
+
+	
+
+Summary, status breakdown, category breakdown, workload
+
+
+
+
+SLA
+
+	
+
+List and manage policies, identify overdue tickets
+
+
+
+
+Reports
+
+	
+
+Ticket volume, resolution time, SLA compliance, CSV export
+
+
+
+
+Notifications
+
+	
+
+List, mark as read, navigate to associated ticket
+
+
+
+
+Categories
+
+	
+
+List, create, update, deactivate categories
+
+API behavior requirements
+
+Use appropriate HTTP methods and status codes.
+
+Validate request bodies and query parameters.
+
+Return consistent success and error responses.
+
+Support pagination and filtering for ticket lists.
+
+Enforce authentication and authorization on protected endpoints.
+
+Prevent unauthorized access to tickets and internal notes.
+
+Ensure critical ticket operations are transaction-safe.
+
+Provide meaningful error messages without exposing sensitive implementation details.
+
+7. User Interface and Design Requirements
+7.1 Overall design direction
+
+The application must have a modern, professional SaaS-style interface appropriate for a college administration platform.
+
+Design principles:
+
+Clean, uncluttered layout.
+
+Consistent spacing and typography.
+
+Clear visual hierarchy.
+
+Responsive design for desktop, tablet, and mobile.
+
+Consistent color coding for statuses and priorities.
+
+Accessible contrast and readable text.
+
+Meaningful loading, empty, success, and error states.
+
+Real data displayed through working API integrations.
+
+Suggested visual direction:
+
+Primary color: Blue.
+
+Background: Light neutral gray.
+
+Cards: White with subtle borders and shadows.
+
+Status indicators: Distinct colors for Open, In Progress, Waiting, Resolved, and Closed.
+
+Priority indicators: Distinct labels for Low, Medium, High, and Urgent.
+
+7.2 Required screens
+Screen 1 — Login
+
+Institution branding.
+
+Email or username field.
+
+Password field.
+
+Login button.
+
+Validation and error messages.
+
+Demo-account access information.
+
+Screen 2 — Admin dashboard
+
+KPI cards.
+
+Ticket status chart.
+
+Category distribution chart.
+
+Staff workload overview.
+
+Overdue tickets section.
+
+Recent activity.
+
+Date filters.
+
+Screen 3 — Staff dashboard
+
+Assigned ticket count.
+
+Pending and overdue tickets.
+
+Approaching SLA deadlines.
+
+Recent assignments.
+
+Quick access to ticket details.
+
+Screen 4 — Student dashboard
+
+Welcome section.
+
+Create-ticket action.
+
+Active and resolved ticket summaries.
+
+Recent tickets.
+
+Notification center.
+
+Screen 5 — Ticket list
+
+Searchable and filterable table.
+
+Ticket number.
+
+Subject.
+
+Requester.
+
+Category.
+
+Priority.
+
+Status.
+
+Assignee.
+
+SLA state.
+
+Created date.
+
+Pagination.
+
+Screen 6 — Ticket details
+
+Ticket information.
+
+Status and priority controls.
+
+Assignment control for authorized users.
+
+Public conversation thread.
+
+Internal notes for authorized staff.
+
+Activity timeline.
+
+SLA information.
+
+Resolution and reopening controls.
+
+Screen 7 — Create-ticket form
+
+Category selection.
+
+Subject.
+
+Description.
+
+Priority.
+
+Optional attachment.
+
+Validation.
+
+Submission confirmation.
+
+Screen 8 — Staff management
+
+Staff directory.
+
+Role and department information.
+
+Account status.
+
+Workload overview.
+
+Assignment eligibility.
+
+Screen 9 — Reports and analytics
+
+Ticket volume.
+
+Category breakdown.
+
+Status distribution.
+
+Resolution-time analysis.
+
+SLA compliance.
+
+CSV export.
+
+Screen 10 — Settings
+
+Ticket categories.
+
+SLA policy configuration.
+
+Department management.
+
+Basic institution settings.
+
+8. Non-Functional Requirements
+8.1 Security
+
+Secure authentication.
+
+Role-based authorization enforced on the backend.
+
+Password hashing or managed authentication.
+
+Protection against unauthorized data access.
+
+Input validation and safe database operations.
+
+No credentials or secret keys committed to source control.
+
+Internal notes protected from student access.
+
+8.2 Performance
+
+Common dashboard and ticket-list requests should respond promptly under normal demo conditions.
+
+Ticket lists should support pagination rather than loading all records at once.
+
+Database queries should be optimized with suitable indexes.
+
+The prototype should remain usable with several thousand sample tickets and users.
+
+8.3 Reliability and consistency
+
+Failed operations must return clear errors.
+
+Critical updates must be transactional.
+
+Concurrent changes should not silently overwrite important ticket updates.
+
+The application must preserve ticket history and relationships.
+
+Demo data must persist across application restarts.
+
+8.4 Usability and accessibility
+
+Responsive layout for desktop and mobile.
+
+Clear form validation and error messages.
+
+Accessible labels for interactive controls.
+
+Keyboard-friendly navigation for essential workflows.
+
+Consistent status and priority labels.
+
+8.5 Maintainability
+
+Organized source code.
+
+Clear separation between UI, business logic, and data access where supported by the selected architecture.
+
+Reusable UI components.
+
+Centralized API and error handling.
+
+Documented environment configuration and startup instructions.
+
+9. Technology and Implementation Constraints
+
+Bolt may choose the technology stack it can implement reliably.
+
+However, the application must satisfy the following requirements:
+
+It must be a full-stack application with persistent data storage.
+
+Authentication and role-based access must work end to end.
+
+The frontend must communicate with real backend logic.
+
+Business rules must be enforced on the server or in an appropriately secured backend service.
+
+The application must not depend on hardcoded dashboard values or simulated ticket operations.
+
+The source code must be accessible and organized for review.
+
+The database must support the required entities and relationships.
+
+The project must include a clear setup and run procedure.
+
+Use managed services where they reduce setup time without compromising the required functionality.
+
+The implementation must be practical for a short assessment timeline.
+
+10. Demo Data and Seed Requirements
+
+The application must include realistic sample data for demonstration and testing.
+
+The seed dataset should include:
+
+At least 1 administrator.
+
+At least 4 support staff members across different departments.
+
+At least 10 student accounts.
+
+At least 30 sample tickets across different categories and priorities.
+
+Tickets in every supported status.
+
+A mix of assigned and unassigned tickets.
+
+Several overdue tickets.
+
+Tickets with public comments, internal notes, and history records.
+
+A variety of creation dates to demonstrate ticket ageing.
+
+Sample categories:
+
+Fees and Payments.
+
+Attendance.
+
+ID Cards.
+
+Documents and Certificates.
+
+Technical Support.
+
+General Administration.
+
+Sample data must be clearly identified as demo data. Demo credentials must be documented in the README.
+
+11. Validation and Testing Requirements
+
+The application must be tested against the following scenarios.
+
+Test ID
+
+	
+
+Scenario
+
+	
+
+Expected result
+
+
+
+
+T-001
+
+	
+
+Student logs in
+
+	
+
+Student dashboard loads
+
+
+
+
+T-002
+
+	
+
+Staff logs in
+
+	
+
+Staff dashboard loads
+
+
+
+
+T-003
+
+	
+
+Admin logs in
+
+	
+
+Admin dashboard loads
+
+
+
+
+T-004
+
+	
+
+Student creates a ticket
+
+	
+
+Ticket is saved and a unique ID is generated
+
+
+
+
+T-005
+
+	
+
+Student accesses another student's ticket
+
+	
+
+Access is denied
+
+
+
+
+T-006
+
+	
+
+Manager assigns a ticket
+
+	
+
+Assignee is updated and history is recorded
+
+
+
+
+T-007
+
+	
+
+Staff adds a public reply
+
+	
+
+Reply is visible to the student
+
+
+
+
+T-008
+
+	
+
+Staff adds an internal note
+
+	
+
+Note is hidden from the student
+
+
+
+
+T-009
+
+	
+
+Staff resolves a ticket without a summary
+
+	
+
+Operation is rejected
+
+
+
+
+T-010
+
+	
+
+Staff resolves a ticket with a summary
+
+	
+
+Ticket moves to Resolved
+
+
+
+
+T-011
+
+	
+
+Student reopens an eligible ticket
+
+	
+
+Ticket returns to the defined active status
+
+
+
+
+T-012
+
+	
+
+Ticket passes its SLA deadline
+
+	
+
+Ticket is marked overdue
+
+
+
+
+T-013
+
+	
+
+User filters tickets by priority
+
+	
+
+Matching tickets are displayed
+
+
+
+
+T-014
+
+	
+
+User searches by ticket number
+
+	
+
+Matching ticket is displayed
+
+
+
+
+T-015
+
+	
+
+Dashboard loads
+
+	
+
+Metrics are derived from persisted data
+
+
+
+
+T-016
+
+	
+
+User logs out
+
+	
+
+Protected pages require authentication
+
+
+
+
+T-017
+
+	
+
+Staff attempts an unauthorized action
+
+	
+
+Access is denied
+
+
+
+
+T-018
+
+	
+
+User submits invalid input
+
+	
+
+Validation errors are displayed
+
+
+
+
+T-019
+
+	
+
+User adds a comment
+
+	
+
+Comment and history persist after refresh
+
+
+
+
+T-020
+
+	
+
+Application restarts
+
+	
+
+Persisted ticket data remains available
+
+12. Acceptance Criteria
+
+The project will be considered ready for submission when the following conditions are met:
+
+Authentication works for student, staff, and admin roles.
+Users can perform actions according to their permissions.
+Students can create and track support tickets.
+Staff can process, assign, and resolve tickets.
+Ticket statuses follow the defined workflow.
+Comments and internal notes are correctly separated.
+Ticket history records significant actions.
+SLA deadlines and overdue indicators work.
+Dashboard metrics are calculated from real data.
+Search, filters, and pagination work.
+The UI is responsive and professionally designed.
+The application runs from a documented setup procedure.
+Seed data and demo credentials are available.
+Core test scenarios have been executed.
+Source code and documentation are ready for review.
+13. Deliverables
+
+The final project must include:
+
+A working CampusCare web application.
+
+Source code repository.
+
+Database schema and seed data.
+
+API documentation or endpoint reference.
+
+README with setup instructions and demo credentials.
+
+Brief architecture and implementation explanation.
+
+Assumptions and trade-offs.
+
+Validation and test results.
+
+Mandatory AI Usage Report.
+
+A short demonstration of the major workflows.
+
+14. Assumptions and Trade-offs
+
+The following assumptions guide the prototype:
+
+The system serves one institution with multiple departments.
+
+Users have one primary role in the initial version.
+
+Students can access only their own tickets.
+
+Staff can access tickets within their authorized scope.
+
+Managers can access organization-wide ticket information.
+
+SLA targets are configurable and initially use elapsed clock time.
+
+In-app notifications are sufficient for the initial prototype.
+
+File attachments are optional and may be omitted if they compromise core functionality.
+
+Automatic assignment is a suggestion feature rather than a mandatory automated workflow.
+
+The application is a functional assessment prototype, not a production-ready enterprise deployment.
