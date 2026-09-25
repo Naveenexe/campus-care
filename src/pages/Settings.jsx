@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Settings as SettingsIcon, Tag, Clock, Building, Plus, Check, Save } from 'lucide-react';
+import { Clock, Tag, Building, Save, Plus } from 'lucide-react';
 import { api } from '../api';
 
 export default function Settings() {
@@ -51,7 +51,7 @@ export default function Settings() {
         resolution_minutes: parseInt(resMins, 10),
         pause_while_waiting: pauseWaiting,
       });
-      setMessage(`SLA Policy for ${prio.toUpperCase()} successfully updated!`);
+      setMessage(`SLA Policy for ${prio.toUpperCase()} successfully updated in registry!`);
       loadAll();
     } catch (err) {
       setError(err.message);
@@ -69,7 +69,7 @@ export default function Settings() {
       });
       setNewCatName('');
       setNewCatDesc('');
-      setMessage('Category created successfully!');
+      setMessage('Category record created successfully in registry!');
       loadAll();
     } catch (err) {
       setError(err.message);
@@ -86,7 +86,7 @@ export default function Settings() {
       });
       setNewDeptName('');
       setNewDeptDesc('');
-      setMessage('Department created successfully!');
+      setMessage('Department entry added to registry!');
       loadAll();
     } catch (err) {
       setError(err.message);
@@ -107,32 +107,65 @@ export default function Settings() {
       {message && <div className="alert alert-success">{message}</div>}
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {/* Settings Navigation Tabs */}
-      <div style={{ display: 'flex', gap: 10, borderBottom: '1px solid #e2e8f0', marginBottom: 24 }}>
+      {/* Settings Navigation Tabs (Drawer Tab divider style) */}
+      <div style={{
+        display: 'flex',
+        gap: 8,
+        borderBottom: '2px solid var(--hairline)',
+        marginBottom: 24,
+        overflowX: 'auto'
+      }}>
         <button
-          className={`btn ${activeTab === 'sla' ? 'btn-primary' : 'btn-secondary'}`}
+          className="btn"
           onClick={() => setActiveTab('sla')}
-          style={{ borderRadius: '8px 8px 0 0', borderBottom: 'none' }}
+          style={{
+            borderRadius: '2px 2px 0 0',
+            border: '1px solid var(--hairline)',
+            borderBottom: activeTab === 'sla' ? '2px solid var(--paper-raised)' : '1px solid var(--hairline)',
+            background: activeTab === 'sla' ? 'var(--paper-raised)' : 'transparent',
+            color: activeTab === 'sla' ? 'var(--ink)' : 'var(--ink-soft)',
+            fontWeight: activeTab === 'sla' ? 700 : 500,
+            marginBottom: -2,
+            boxShadow: 'none'
+          }}
         >
-          <Clock size={16} />
-          SLA Targets Configuration
+          <Clock size={15} />
+          SLA Targets Schedule
         </button>
 
         <button
-          className={`btn ${activeTab === 'categories' ? 'btn-primary' : 'btn-secondary'}`}
+          className="btn"
           onClick={() => setActiveTab('categories')}
-          style={{ borderRadius: '8px 8px 0 0', borderBottom: 'none' }}
+          style={{
+            borderRadius: '2px 2px 0 0',
+            border: '1px solid var(--hairline)',
+            borderBottom: activeTab === 'categories' ? '2px solid var(--paper-raised)' : '1px solid var(--hairline)',
+            background: activeTab === 'categories' ? 'var(--paper-raised)' : 'transparent',
+            color: activeTab === 'categories' ? 'var(--ink)' : 'var(--ink-soft)',
+            fontWeight: activeTab === 'categories' ? 700 : 500,
+            marginBottom: -2,
+            boxShadow: 'none'
+          }}
         >
-          <Tag size={16} />
-          Ticket Categories ({categories.length})
+          <Tag size={15} />
+          Inquiry Categories ({categories.length})
         </button>
 
         <button
-          className={`btn ${activeTab === 'departments' ? 'btn-primary' : 'btn-secondary'}`}
+          className="btn"
           onClick={() => setActiveTab('departments')}
-          style={{ borderRadius: '8px 8px 0 0', borderBottom: 'none' }}
+          style={{
+            borderRadius: '2px 2px 0 0',
+            border: '1px solid var(--hairline)',
+            borderBottom: activeTab === 'departments' ? '2px solid var(--paper-raised)' : '1px solid var(--hairline)',
+            background: activeTab === 'departments' ? 'var(--paper-raised)' : 'transparent',
+            color: activeTab === 'departments' ? 'var(--ink)' : 'var(--ink-soft)',
+            fontWeight: activeTab === 'departments' ? 700 : 500,
+            marginBottom: -2,
+            boxShadow: 'none'
+          }}
         >
-          <Building size={16} />
+          <Building size={15} />
           Departments ({departments.length})
         </button>
       </div>
@@ -141,48 +174,59 @@ export default function Settings() {
       {activeTab === 'sla' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div className="card">
-            <h3 className="card-title" style={{ marginBottom: 6 }}>
-              Priority Response & Resolution Targets (FR-030, FR-054)
-            </h3>
-            <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: 20 }}>
-              Specify the maximum allowed time windows before a ticket is flagged as Approaching Deadline or Overdue.
+            <h2 className="card-title" style={{ marginBottom: 6 }}>
+              Institutional SLA Turnaround Standards
+            </h2>
+            <p className="meta-small" style={{ marginBottom: 20 }}>
+              Adjust target response windows and resolution deadlines per priority tier. Time is logged in hours and minutes.
             </p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 16 }}>
-              {slaPolicies.map(policy => (
-                <SlaPolicyCard key={policy.priority} policy={policy} onSave={handleUpdateSla} />
-              ))}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {slaPolicies.map(pol => {
+                return (
+                  <SlaPolicyRow
+                    key={pol.priority}
+                    policy={pol}
+                    onSave={handleUpdateSla}
+                  />
+                );
+              })}
             </div>
           </div>
         </div>
       )}
 
-      {/* Tab 2: Categories */}
+      {/* Tab 2: Inquiry Categories */}
       {activeTab === 'categories' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.8fr) minmax(280px, 1fr)', gap: 24 }}>
+          {/* Categories Table */}
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div className="card-header" style={{ padding: '18px 24px', margin: 0 }}>
+              <h2 className="card-title">Registered Inquiry Categories</h2>
+              <span className="meta-small">{categories.length} active</span>
+            </div>
+
             <div className="table-container" style={{ border: 'none' }}>
               <table className="table">
                 <thead>
                   <tr>
                     <th>Category Name</th>
-                    <th>Routing Department</th>
-                    <th>Description</th>
+                    <th>Designated Department</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {categories.map(c => (
                     <tr key={c.id}>
-                      <td style={{ fontWeight: 700, color: '#0f172a' }}>{c.name}</td>
                       <td>
-                        <span style={{ background: '#eff6ff', padding: '3px 8px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 600, color: '#1d4ed8' }}>
-                          {c.department_name || 'General'}
-                        </span>
+                        <div style={{ fontWeight: 600, color: 'var(--ink)' }}>{c.name}</div>
+                        <div className="meta-small">{c.description}</div>
                       </td>
-                      <td style={{ fontSize: '0.8rem', color: '#64748b' }}>{c.description}</td>
                       <td>
-                        <span className="badge badge-status-resolved">Active</span>
+                        <span style={{ fontWeight: 500 }}>{c.department_name || 'General Records'}</span>
+                      </td>
+                      <td>
+                        <span className="badge-status badge-status-resolved">Active</span>
                       </td>
                     </tr>
                   ))}
@@ -193,19 +237,30 @@ export default function Settings() {
 
           {/* Add Category Form */}
           <div className="card">
-            <h3 className="card-title" style={{ fontSize: '1rem', marginBottom: 14 }}>
-              Add New Category
-            </h3>
+            <h2 className="card-title" style={{ marginBottom: 14 }}>
+              Register New Category
+            </h2>
             <form onSubmit={handleAddCategory}>
               <div className="form-group">
                 <label className="form-label">Category Name</label>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="e.g. Hostel & Accommodation"
+                  placeholder="e.g. Hostel Room Transfer"
                   value={newCatName}
                   onChange={(e) => setNewCatName(e.target.value)}
                   required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Description / Scope</label>
+                <textarea
+                  className="form-control"
+                  rows={3}
+                  placeholder="Describe the nature of requests cataloged under this header..."
+                  value={newCatDesc}
+                  onChange={(e) => setNewCatDesc(e.target.value)}
                 />
               </div>
 
@@ -216,26 +271,16 @@ export default function Settings() {
                   value={newCatDeptId}
                   onChange={(e) => setNewCatDeptId(e.target.value)}
                 >
-                  <option value="">-- No Specific Department --</option>
+                  <option value="">General Records Desk</option>
                   {departments.map(d => (
                     <option key={d.id} value={d.id}>{d.name}</option>
                   ))}
                 </select>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Description</label>
-                <textarea
-                  className="form-control"
-                  rows={3}
-                  placeholder="Scope of student requests handled under this category..."
-                  value={newCatDesc}
-                  onChange={(e) => setNewCatDesc(e.target.value)}
-                />
-              </div>
-
-              <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                <Plus size={16} /> Add Category
+              <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8 }}>
+                <Plus size={16} />
+                Add Category to Registry
               </button>
             </form>
           </div>
@@ -244,25 +289,27 @@ export default function Settings() {
 
       {/* Tab 3: Departments */}
       {activeTab === 'departments' && (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 24 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.8fr) minmax(280px, 1fr)', gap: 24 }}>
+          {/* Departments Table */}
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+            <div className="card-header" style={{ padding: '18px 24px', margin: 0 }}>
+              <h2 className="card-title">Configured College Departments</h2>
+              <span className="meta-small">{departments.length} total</span>
+            </div>
+
             <div className="table-container" style={{ border: 'none' }}>
               <table className="table">
                 <thead>
                   <tr>
                     <th>Department Name</th>
-                    <th>Description</th>
-                    <th>Status</th>
+                    <th>Operational Scope</th>
                   </tr>
                 </thead>
                 <tbody>
                   {departments.map(d => (
                     <tr key={d.id}>
-                      <td style={{ fontWeight: 700, color: '#0f172a' }}>{d.name}</td>
-                      <td style={{ fontSize: '0.85rem', color: '#475569' }}>{d.description}</td>
-                      <td>
-                        <span className="badge badge-status-resolved">Active</span>
-                      </td>
+                      <td style={{ fontWeight: 600, color: 'var(--ink)' }}>{d.name}</td>
+                      <td className="meta-small">{d.description || 'General administrative support'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -270,17 +317,18 @@ export default function Settings() {
             </div>
           </div>
 
+          {/* Add Department Form */}
           <div className="card">
-            <h3 className="card-title" style={{ fontSize: '1rem', marginBottom: 14 }}>
-              Add Department
-            </h3>
+            <h2 className="card-title" style={{ marginBottom: 14 }}>
+              Register Department
+            </h2>
             <form onSubmit={handleAddDepartment}>
               <div className="form-group">
-                <label className="form-label">Department Name</label>
+                <label className="form-label">Department Title</label>
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="e.g. Placements & Corporate Relations"
+                  placeholder="e.g. Examinations & Grading Bureau"
                   value={newDeptName}
                   onChange={(e) => setNewDeptName(e.target.value)}
                   required
@@ -288,18 +336,19 @@ export default function Settings() {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Description</label>
+                <label className="form-label">Mandate / Scope</label>
                 <textarea
                   className="form-control"
                   rows={3}
-                  placeholder="Responsibilities and services managed..."
+                  placeholder="Official purview of this department..."
                   value={newDeptDesc}
                   onChange={(e) => setNewDeptDesc(e.target.value)}
                 />
               </div>
 
-              <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>
-                <Plus size={16} /> Add Department
+              <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: 8 }}>
+                <Plus size={16} />
+                Register Department
               </button>
             </form>
           </div>
@@ -309,99 +358,99 @@ export default function Settings() {
   );
 }
 
-function SlaPolicyCard({ policy, onSave }) {
-  const [firstResp, setFirstResp] = useState(policy.first_response_minutes);
-  const [resMins, setResMins] = useState(policy.resolution_minutes);
-  const [pauseWaiting, setPauseWaiting] = useState(Boolean(policy.pause_while_waiting));
-  const [dirty, setDirty] = useState(false);
+// Inner helper row for SLA Policy editing
+function SlaPolicyRow({ policy, onSave }) {
+  const [firstRespMins, setFirstRespMins] = useState(policy.first_response_minutes || 60);
+  const [resMins, setResMins] = useState(policy.resolution_minutes || 1440);
+  const [pauseWaiting, setPauseWaiting] = useState(!!policy.pause_while_waiting);
+  const [isChanged, setIsChanged] = useState(false);
 
-  const colors = {
-    urgent: { bg: '#fff1f2', border: '#fecdd3', text: '#e11d48' },
-    high: { bg: '#fff7ed', border: '#fed7aa', text: '#ea580c' },
-    medium: { bg: '#eef2ff', border: '#c7d2fe', text: '#4f46e5' },
-    low: { bg: '#f0fdfa', border: '#99f6e4', text: '#0d9488' },
+  const handleFirstChange = (val) => {
+    setFirstRespMins(val);
+    setIsChanged(true);
   };
 
-  const c = colors[policy.priority.toLowerCase()] || colors.medium;
+  const handleResChange = (val) => {
+    setResMins(val);
+    setIsChanged(true);
+  };
+
+  const handlePauseChange = (val) => {
+    setPauseWaiting(val);
+    setIsChanged(true);
+  };
+
+  const handleSave = () => {
+    onSave(policy.priority, firstRespMins, resMins, pauseWaiting);
+    setIsChanged(false);
+  };
 
   return (
     <div style={{
-      background: c.bg,
-      border: `1px solid ${c.border}`,
-      borderRadius: 12,
-      padding: 20,
+      padding: '16px 20px',
+      border: '1px solid var(--hairline)',
+      borderRadius: 2,
+      background: 'var(--paper)',
       display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between'
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 16,
+      flexWrap: 'wrap'
     }}>
-      <div>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-          <span style={{ fontWeight: 800, fontSize: '1rem', color: c.text, textTransform: 'uppercase' }}>
-            {policy.priority} Priority
-          </span>
-          <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b' }}>
-            {Math.round(resMins / 60)}h Total Target
-          </span>
-        </div>
+      <div style={{ minWidth: 120 }}>
+        <span className={`stamp-badge stamp-${policy.priority.toLowerCase()}`}>
+          {policy.priority.toUpperCase()}
+        </span>
+      </div>
 
-        <div className="form-group">
-          <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#334155' }}>
-            First Staff Response (Minutes)
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+        <div>
+          <label className="meta-small" style={{ display: 'block', fontSize: '0.7rem' }}>
+            First Response (Hours)
           </label>
           <input
             type="number"
-            className="form-control"
-            value={firstResp}
-            onChange={(e) => { setFirstResp(e.target.value); setDirty(true); }}
-            min={5}
+            className="form-control data-mono"
+            style={{ width: 100, padding: '4px 8px', fontSize: '0.85rem' }}
+            value={Math.round(firstRespMins / 60)}
+            onChange={(e) => handleFirstChange(Math.max(1, parseInt(e.target.value || 1, 10)) * 60)}
           />
-          <span style={{ fontSize: '0.7rem', color: '#64748b' }}>
-            ≈ {(firstResp / 60).toFixed(1)} hours
-          </span>
         </div>
 
-        <div className="form-group">
-          <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#334155' }}>
-            Full Resolution Target (Minutes)
+        <div>
+          <label className="meta-small" style={{ display: 'block', fontSize: '0.7rem' }}>
+            Final Resolution (Hours)
           </label>
           <input
             type="number"
-            className="form-control"
-            value={resMins}
-            onChange={(e) => { setResMins(e.target.value); setDirty(true); }}
-            min={15}
+            className="form-control data-mono"
+            style={{ width: 100, padding: '4px 8px', fontSize: '0.85rem' }}
+            value={Math.round(resMins / 60)}
+            onChange={(e) => handleResChange(Math.max(1, parseInt(e.target.value || 1, 10)) * 60)}
           />
-          <span style={{ fontSize: '0.7rem', color: '#64748b' }}>
-            ≈ {(resMins / 60).toFixed(1)} hours
-          </span>
         </div>
 
-        <div style={{ marginTop: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingTop: 18 }}>
           <input
             type="checkbox"
             id={`pause-${policy.priority}`}
             checked={pauseWaiting}
-            onChange={(e) => { setPauseWaiting(e.target.checked); setDirty(true); }}
+            onChange={(e) => handlePauseChange(e.target.checked)}
           />
-          <label htmlFor={`pause-${policy.priority}`} style={{ fontSize: '0.775rem', color: '#334155', cursor: 'pointer' }}>
-            Pause timer when Waiting for Student
+          <label htmlFor={`pause-${policy.priority}`} className="meta-small" style={{ cursor: 'pointer' }}>
+            Pause SLA clock during student reply
           </label>
         </div>
       </div>
 
-      <div style={{ marginTop: 18 }}>
-        <button
-          className="btn btn-secondary btn-sm"
-          style={{ width: '100%', borderColor: c.border }}
-          disabled={!dirty}
-          onClick={() => {
-            onSave(policy.priority, firstResp, resMins, pauseWaiting);
-            setDirty(false);
-          }}
-        >
-          <Save size={14} /> Save SLA Target
-        </button>
-      </div>
+      <button
+        onClick={handleSave}
+        className="btn btn-primary btn-sm"
+        disabled={!isChanged}
+      >
+        <Save size={13} />
+        Update Policy
+      </button>
     </div>
   );
 }

@@ -8,18 +8,15 @@ const statusLabels = {
   closed: 'Closed',
 };
 
-export default function StatusBadge({ status }) {
+export default function StatusBadge({ status, isActive = false, animateSettle = false }) {
   const normalized = (status || 'open').toLowerCase();
   const label = statusLabels[normalized] || status;
 
   return (
-    <span className={`badge badge-status-${normalized}`}>
-      <span style={{
-        width: 6,
-        height: 6,
-        borderRadius: '50%',
-        backgroundColor: 'currentColor'
-      }} />
+    <span
+      className={`badge-status badge-status-${normalized} ${isActive ? 'badge-status-active' : ''} ${animateSettle ? 'stamp-settling' : ''}`}
+      title={`Current Status: ${label}`}
+    >
       {label}
     </span>
   );

@@ -6,35 +6,35 @@ export default function SlaBadge({ slaStatus }) {
 
   if (norm === 'Overdue') {
     return (
-      <span className="badge badge-sla-overdue" title="Resolution or response SLA has been breached!">
+      <span className="badge-sla badge-sla-overdue" title="Resolution target breached">
         <AlertOctagon size={12} strokeWidth={2.5} />
-        Overdue
+        OVERDUE
       </span>
     );
   }
 
   if (norm === 'Approaching Deadline') {
     return (
-      <span className="badge badge-sla-approaching" title="Approaching SLA deadline!">
+      <span className="badge-sla badge-sla-approaching" title="Approaching SLA deadline">
         <Clock size={12} strokeWidth={2.5} />
-        Approaching
+        DUE SOON
       </span>
     );
   }
 
   if (norm === 'Completed') {
     return (
-      <span className="badge badge-sla-completed">
+      <span className="badge-sla badge-sla-completed" title="SLA successfully met">
         <CheckCircle2 size={12} strokeWidth={2} />
-        Completed
+        MET
       </span>
     );
   }
 
   return (
-    <span className="badge badge-sla-on-track">
+    <span className="badge-sla badge-sla-on-track" title="Within response timeline">
       <ShieldCheck size={12} strokeWidth={2} />
-      On Track
+      ON TRACK
     </span>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { GraduationCap, LogOut, User, Shield, ChevronDown, Check } from 'lucide-react';
+import { Landmark, LogOut, ChevronDown, Check } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
 import { api } from '../api';
 
@@ -13,25 +13,35 @@ export default function Navbar({ user, onLogout, onSwitchUser, onSelectTicket })
       .catch(() => {});
   }, []);
 
-  const roleColors = {
-    admin: { bg: '#eff6ff', color: '#1d4ed8', border: '#bfdbfe', label: 'Admin / Manager' },
-    staff: { bg: '#f5f3ff', color: '#6d28d9', border: '#ddd6fe', label: 'Support Staff' },
-    student: { bg: '#ecfdf5', color: '#047857', border: '#a7f3d0', label: 'Student' },
+  const roleStyles = {
+    admin: {
+      className: 'role-tag-admin',
+      avatarClass: 'avatar-admin',
+      label: 'Registrar Admin'
+    },
+    staff: {
+      className: 'role-tag-staff',
+      avatarClass: 'avatar-staff',
+      label: 'Department Staff'
+    },
+    student: {
+      className: 'role-tag-student',
+      avatarClass: 'avatar-student',
+      label: 'Student Enrollee'
+    },
   };
 
-  const roleStyle = roleColors[user?.role] || roleColors.student;
+  const currentRoleStyle = roleStyles[user?.role] || roleStyles.student;
 
   return (
     <header className="navbar">
       <div className="navbar-brand">
         <div className="brand-icon-box">
-          <GraduationCap size={22} />
+          <Landmark size={20} strokeWidth={2} />
         </div>
-        <div>
-          <span>CampusCare</span>
-          <span style={{ fontSize: '0.75rem', fontWeight: 500, color: '#64748b', marginLeft: 8, display: 'inline-block' }}>
-            Support Portal
-          </span>
+        <div style={{ display: 'flex', alignItems: 'baseline' }}>
+          <span className="navbar-brand-name">CampusCare</span>
+          <span className="navbar-brand-sub">Registrar's Desk</span>
         </div>
       </div>
 
@@ -40,21 +50,10 @@ export default function Navbar({ user, onLogout, onSwitchUser, onSelectTicket })
         <div style={{ position: 'relative' }}>
           <button
             onClick={() => setShowDemoMenu(!showDemoMenu)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              background: '#f8fafc',
-              border: '1px solid #cbd5e1',
-              padding: '6px 12px',
-              borderRadius: 8,
-              fontSize: '0.825rem',
-              fontWeight: 600,
-              color: '#334155',
-              cursor: 'pointer'
-            }}
+            className="btn btn-secondary btn-sm"
+            style={{ borderRadius: 'var(--radius-input)', fontSize: '0.8rem' }}
           >
-            <span>Switch Role / Demo User</span>
+            <span>Switch Role / User</span>
             <ChevronDown size={14} />
           </button>
 
@@ -66,15 +65,22 @@ export default function Navbar({ user, onLogout, onSwitchUser, onSelectTicket })
               width: 280,
               maxHeight: 340,
               overflowY: 'auto',
-              background: '#ffffff',
-              borderRadius: 10,
-              border: '1px solid #e2e8f0',
-              boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)',
+              background: 'var(--paper-raised)',
+              borderRadius: 'var(--radius-modal)',
+              border: '1px solid var(--hairline)',
+              boxShadow: 'var(--shadow-offset-lg)',
               zIndex: 60,
               padding: 6
             }}>
-              <div style={{ padding: '6px 10px', fontSize: '0.7rem', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
-                Instant Switch Demo Accounts
+              <div style={{
+                padding: '8px 10px',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                color: 'var(--ink-soft)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                Institutional Accounts
               </div>
               {demoAccounts.map(acc => {
                 const isCurrent = acc.id === user?.id;
@@ -91,22 +97,22 @@ export default function Navbar({ user, onLogout, onSwitchUser, onSelectTicket })
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      borderRadius: 6,
-                      background: isCurrent ? '#f1f5f9' : 'transparent',
+                      borderRadius: 4,
+                      background: isCurrent ? 'var(--paper)' : 'transparent',
                       border: 'none',
                       cursor: 'pointer',
                       textAlign: 'left'
                     }}
                   >
                     <div>
-                      <div style={{ fontSize: '0.825rem', fontWeight: isCurrent ? 700 : 600, color: '#0f172a' }}>
+                      <div style={{ fontSize: '0.825rem', fontWeight: isCurrent ? 700 : 500, color: 'var(--ink)' }}>
                         {acc.full_name}
                       </div>
-                      <div style={{ fontSize: '0.725rem', color: '#64748b' }}>
-                        {acc.role.toUpperCase()} • {acc.department_name || acc.student_or_employee_id || 'Campus'}
+                      <div className="data-mono" style={{ fontSize: '0.7rem', color: 'var(--ink-soft)' }}>
+                        {acc.role.toUpperCase()} • {acc.department_name || acc.student_or_employee_id || 'General'}
                       </div>
                     </div>
-                    {isCurrent && <Check size={14} color="#2563eb" />}
+                    {isCurrent && <Check size={14} color="var(--brass)" />}
                   </button>
                 );
               })}
@@ -115,56 +121,33 @@ export default function Navbar({ user, onLogout, onSwitchUser, onSelectTicket })
         </div>
 
         {/* Current Role Tag */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          background: roleStyle.bg,
-          color: roleStyle.color,
-          border: `1px solid ${roleStyle.border}`,
-          padding: '5px 12px',
-          borderRadius: 20,
-          fontSize: '0.8rem',
-          fontWeight: 700
-        }}>
-          <Shield size={13} />
-          {roleStyle.label}
+        <div className={`role-tag ${currentRoleStyle.className}`}>
+          {currentRoleStyle.label}
         </div>
 
         {/* Notifications Dropdown */}
         <NotificationDropdown onSelectTicket={onSelectTicket} />
 
-        {/* User Info & Logout */}
+        {/* User Profile & Logout */}
         <div className="user-profile-menu">
-          <div className="avatar">
-            {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'U'}
+          <div className={`avatar ${currentRoleStyle.avatarClass}`}>
+            {user?.full_name ? user.full_name.charAt(0).toUpperCase() : 'R'}
           </div>
           <div style={{ display: 'none', md: 'block' }}>
-            <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f172a', lineHeight: 1.2 }}>
+            <div style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--ink)', lineHeight: 1.2 }}>
               {user?.full_name}
             </div>
-            <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+            <div className="data-mono" style={{ fontSize: '0.725rem', color: 'var(--ink-soft)' }}>
               {user?.email}
             </div>
           </div>
           <button
             onClick={onLogout}
-            title="Log out"
-            style={{
-              background: '#f8fafc',
-              border: '1px solid #e2e8f0',
-              borderRadius: 8,
-              width: 36,
-              height: 36,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#64748b',
-              cursor: 'pointer',
-              marginLeft: 4
-            }}
+            title="Close desk session (Log out)"
+            className="btn btn-secondary btn-sm"
+            style={{ width: 34, height: 34, padding: 0, borderRadius: 'var(--radius-input)' }}
           >
-            <LogOut size={16} />
+            <LogOut size={15} />
           </button>
         </div>
       </div>

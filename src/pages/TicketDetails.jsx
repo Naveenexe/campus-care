@@ -8,13 +8,9 @@ import {
   MessageSquare,
   Lock,
   Send,
-  Calendar,
   AlertTriangle,
   History,
-  FileText,
-  User,
-  Shield,
-  ChevronDown
+  Check,
 } from 'lucide-react';
 import { api } from '../api';
 import StatusBadge from '../components/StatusBadge';
@@ -24,12 +20,21 @@ import AssignModal from '../components/AssignModal';
 import ResolveModal from '../components/ResolveModal';
 import ReopenModal from '../components/ReopenModal';
 
+const LIFECYCLE_STAGES = [
+  { key: 'open', label: 'Open' },
+  { key: 'in_progress', label: 'In Progress' },
+  { key: 'waiting_for_student', label: 'Waiting for Student' },
+  { key: 'resolved', label: 'Resolved' },
+  { key: 'closed', label: 'Closed' },
+];
+
 export default function TicketDetails({ ticketId, user, onBack }) {
   const [ticket, setTicket] = useState(null);
   const [comments, setComments] = useState([]);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [justStatusUpdated, setJustStatusUpdated] = useState(false);
 
   // Comment input
   const [commentText, setCommentText] = useState('');
@@ -52,7 +57,7 @@ export default function TicketDetails({ ticketId, user, onBack }) {
       setComments(data.comments || []);
       setHistory(data.history || []);
     } catch (err) {
-      setError(err.message || 'Failed to load ticket');
+      setError(err.message || 'Failed to retrieve ticket record from registry');
     } finally {
       setLoading(false);
     }
@@ -86,6 +91,8 @@ export default function TicketDetails({ ticketId, user, onBack }) {
 
     try {
       await api.updateStatus(ticketId, newStatus);
+      setJustStatusUpdated(true);
+      setTimeout(() => setJustStatusUpdated(false), 800);
       fetchTicket();
     } catch (err) {
       alert(err.message);
@@ -103,21 +110,21 @@ export default function TicketDetails({ ticketId, user, onBack }) {
 
   if (loading) {
     return (
-      <div style={{ padding: '60px 0', textAlign: 'center', color: '#64748b' }}>
-        <Clock size={32} className="animate-spin" style={{ margin: '0 auto 12px' }} />
-        <p>Loading ticket workspace...</p>
+      <div style={{ padding: '60px 0', textAlign: 'center', color: 'var(--ink-soft)' }}>
+        <Clock size={32} className="animate-spin" style={{ margin: '0 auto 12px', color: 'var(--brass)' }} />
+        <p className="data-mono">Retrieving ticket dossier from registry...</p>
       </div>
     );
   }
 
   if (error || !ticket) {
     return (
-      <div className="card" style={{ textAlign: 'center', padding: 40 }}>
-        <div className="alert alert-danger" style={{ maxWidth: 400, margin: '0 auto 20px' }}>
-          {error || 'Ticket not found or access denied'}
+      <div className="card" style={{ textAlign: 'center', padding: 40, maxWidth: 540, margin: '40px auto' }}>
+        <div className="alert alert-danger" style={{ marginBottom: 20 }}>
+          {error || 'This inquiry record does not exist or access has been restricted by the Registrar.'}
         </div>
         <button className="btn btn-secondary" onClick={onBack}>
-          <ArrowLeft size={16} /> Return to Ticket List
+          <ArrowLeft size={16} /> Return to Ticket Registry
         </button>
       </div>
     );
@@ -132,9 +139,19 @@ export default function TicketDetails({ ticketId, user, onBack }) {
     return true;
   });
 
+  // Calculate lifecycle stepper state
+  const stageOrder = {
+    open: 0,
+    in_progress: 1,
+    waiting_for_student: 2,
+    resolved: 3,
+    closed: 4,
+  };
+  const currentStageIndex = stageOrder[ticket.status] ?? 0;
+
   return (
     <div>
-      {/* Top Navigation & Status Bar */}
+      {/* Top Header & Quick Actions */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -143,29 +160,32 @@ export default function TicketDetails({ ticketId, user, onBack }) {
         gap: 16,
         flexWrap: 'wrap'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <button className="btn btn-secondary btn-sm" onClick={onBack} title="Go back">
-            <ArrowLeft size={16} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <button className="btn btn-secondary btn-sm" onClick={onBack} title="Return to registry queue">
+            <ArrowLeft size={15} />
             Back
           </button>
-          <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>
+          <span className="data-mono" style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--ink)' }}>
             {ticket.ticket_number}
           </span>
-          <StatusBadge status={ticket.status} />
+          <StatusBadge status={ticket.status} animateSettle={justStatusUpdated} />
           <PriorityBadge priority={ticket.priority} />
           <SlaBadge slaStatus={ticket.sla_status} />
+          <div className="ownership-chip">
+            Ball's in: <strong>{ticket.next_action_owner || 'Staff'}</strong>
+          </div>
         </div>
 
         {/* Action Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
           {isStaffOrAdmin && (
             <>
-              {/* Status Transition Select */}
+              {/* Status Select */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#64748b' }}>Status:</span>
+                <span className="meta-small">Status:</span>
                 <select
                   className="form-control"
-                  style={{ width: 'auto', padding: '6px 12px', fontSize: '0.85rem' }}
+                  style={{ width: 'auto', padding: '5px 10px', fontSize: '0.825rem' }}
                   value={ticket.status}
                   onChange={(e) => handleStatusChange(e.target.value)}
                 >
@@ -179,10 +199,10 @@ export default function TicketDetails({ ticketId, user, onBack }) {
 
               {/* Priority Select */}
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#64748b' }}>Priority:</span>
+                <span className="meta-small">Priority:</span>
                 <select
                   className="form-control"
-                  style={{ width: 'auto', padding: '6px 12px', fontSize: '0.85rem' }}
+                  style={{ width: 'auto', padding: '5px 10px', fontSize: '0.825rem' }}
                   value={ticket.priority}
                   onChange={(e) => handlePriorityChange(e.target.value)}
                 >
@@ -203,7 +223,7 @@ export default function TicketDetails({ ticketId, user, onBack }) {
               {ticket.status !== 'resolved' && ticket.status !== 'closed' && (
                 <button className="btn btn-success btn-sm" onClick={() => setIsResolveOpen(true)}>
                   <CheckCircle2 size={14} />
-                  Resolve
+                  Resolve Case
                 </button>
               )}
             </>
@@ -213,18 +233,49 @@ export default function TicketDetails({ ticketId, user, onBack }) {
           {canReopen && (
             <button className="btn btn-secondary btn-sm" onClick={() => setIsReopenOpen(true)}>
               <RefreshCw size={14} />
-              Reopen Ticket
+              Reopen Case
             </button>
           )}
         </div>
       </div>
 
-      {/* SLA Alert Banner (FR-031 to FR-034) */}
+      {/* Ticket Lifecycle Stepper: Horizontal drawer rail of 5 stages */}
+      <div className="ticket-stepper" aria-label="Ticket lifecycle progression">
+        {LIFECYCLE_STAGES.map((st, idx) => {
+          const isCurrent = idx === currentStageIndex;
+          const isCompleted = idx < currentStageIndex;
+          const isFuture = idx > currentStageIndex;
+
+          let stageClass = 'future';
+          if (isCurrent) stageClass = 'current';
+          else if (isCompleted) stageClass = 'completed';
+
+          return (
+            <div key={st.key} className={`stepper-stage ${stageClass}`}>
+              <span className="stepper-num">{idx + 1}.</span>
+              <span>{st.label}</span>
+              {isCompleted && <Check size={13} strokeWidth={2.5} style={{ color: 'var(--sage)' }} />}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* SLA Alert Strip */}
       <div style={{
-        background: ticket.is_overdue ? '#fef2f2' : ticket.is_approaching ? '#fffbeb' : '#f0fdf4',
-        border: `1px solid ${ticket.is_overdue ? '#fecaca' : ticket.is_approaching ? '#fde68a' : '#bbf7d0'}`,
-        borderRadius: 12,
-        padding: '14px 20px',
+        background: ticket.is_overdue
+          ? 'rgba(122, 42, 40, 0.08)'
+          : ticket.is_approaching
+            ? 'rgba(169, 120, 46, 0.1)'
+            : 'rgba(92, 122, 82, 0.08)',
+        border: `1px solid ${
+          ticket.is_overdue
+            ? 'var(--oxblood)'
+            : ticket.is_approaching
+              ? 'var(--brass)'
+              : 'var(--sage)'
+        }`,
+        borderRadius: 2,
+        padding: '12px 18px',
         marginBottom: 24,
         display: 'flex',
         alignItems: 'center',
@@ -234,89 +285,93 @@ export default function TicketDetails({ ticketId, user, onBack }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           {ticket.is_overdue ? (
-            <AlertTriangle size={20} color="#dc2626" />
+            <AlertTriangle size={18} color="var(--oxblood)" />
           ) : (
-            <Clock size={20} color={ticket.is_approaching ? '#d97706' : '#16a34a'} />
+            <Clock size={18} color={ticket.is_approaching ? 'var(--brass)' : 'var(--sage)'} />
           )}
           <div>
-            <div style={{ fontSize: '0.875rem', fontWeight: 700, color: ticket.is_overdue ? '#991b1b' : ticket.is_approaching ? '#92400e' : '#166534' }}>
-              SLA Policy Status: {ticket.sla_status}
+            <div style={{
+              fontSize: '0.85rem',
+              fontWeight: 700,
+              color: ticket.is_overdue ? 'var(--oxblood)' : ticket.is_approaching ? 'var(--brass)' : 'var(--forest)'
+            }}>
+              SLA Standard: {ticket.sla_status}
             </div>
-            <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: 2 }}>
-              First Response Target: {ticket.first_response_due_at ? new Date(ticket.first_response_due_at).toLocaleString() : 'N/A'}{' '}
+            <div className="meta-small" style={{ marginTop: 2 }}>
+              First Response: {ticket.first_response_due_at ? new Date(ticket.first_response_due_at).toLocaleString() : 'N/A'}{' '}
               {ticket.first_responded_at ? ' (Responded)' : ' (Pending)'} •
-              Resolution Target: {ticket.resolution_due_at ? new Date(ticket.resolution_due_at).toLocaleString() : 'N/A'}
+              Final Resolution Target: {ticket.resolution_due_at ? new Date(ticket.resolution_due_at).toLocaleString() : 'N/A'}
             </div>
           </div>
         </div>
 
-        <div style={{
-          background: '#ffffff',
-          border: '1px solid #e2e8f0',
-          padding: '6px 14px',
-          borderRadius: 8,
-          fontSize: '0.825rem',
-          fontWeight: 600,
-          color: '#334155'
-        }}>
-          Next Action Expected From: <strong style={{ color: '#2563eb', textTransform: 'capitalize' }}>{ticket.next_action_owner || 'Staff'}</strong>
+        <div className="ownership-chip">
+          Action expected from: <strong>{ticket.next_action_owner || 'Staff'}</strong>
         </div>
       </div>
 
       {/* Main Grid: Details + Thread on Left, Meta Cards on Right */}
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.8fr) minmax(280px, 1fr)', gap: 24 }}>
-        {/* Left Column: Subject, Description, Resolution Summary, and Conversation */}
+        {/* Left Column: Inquiry card and Thread */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {/* Main Inquiry Card */}
-          <div className="card">
-            <h2 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', marginBottom: 12, lineHeight: 1.3 }}>
+          <div className="card" style={{ position: 'relative' }}>
+            {/* Top-Right Priority Ink Stamp on Ticket Card */}
+            <PriorityBadge priority={ticket.priority} isCardStamp={true} />
+
+            <div className="data-mono" style={{ fontSize: '0.75rem', color: 'var(--ink-soft)', marginBottom: 8 }}>
+              {ticket.ticket_number} • Category: {ticket.category_name}
+            </div>
+
+            <h1 style={{ fontSize: '1.4rem', fontWeight: 500, color: 'var(--ink)', marginBottom: 12, lineHeight: 1.3 }}>
               {ticket.subject}
-            </h2>
-            <div style={{
+            </h1>
+
+            {/* Ticket description: limited to under 80 characters per line */}
+            <div className="readable-measure" style={{
               fontSize: '0.95rem',
-              color: '#334155',
-              lineHeight: 1.6,
-              background: '#f8fafc',
+              color: 'var(--ink)',
+              background: 'var(--paper)',
               padding: 16,
-              borderRadius: 10,
-              border: '1px solid #e2e8f0',
+              borderRadius: 2,
+              border: '1px solid var(--hairline)',
               whiteSpace: 'pre-wrap'
             }}>
               {ticket.description}
             </div>
 
-            {/* Resolution Summary Card if resolved */}
+            {/* Official Resolution Summary if resolved */}
             {ticket.resolution_summary && (
               <div style={{
                 marginTop: 20,
-                background: '#ecfdf5',
-                border: '1px solid #a7f3d0',
-                borderRadius: 10,
+                background: 'rgba(92, 122, 82, 0.1)',
+                border: '1px solid var(--sage)',
+                borderRadius: 2,
                 padding: 16
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#047857', fontWeight: 700, fontSize: '0.9rem', marginBottom: 6 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--sage)', fontWeight: 700, fontSize: '0.875rem', marginBottom: 6 }}>
                   <CheckCircle2 size={16} />
-                  Official Resolution Summary
+                  Official Resolution Record
                 </div>
-                <p style={{ fontSize: '0.9rem', color: '#065f46', lineHeight: 1.5 }}>
+                <p className="readable-measure" style={{ fontSize: '0.9rem', color: 'var(--ink)', margin: 0 }}>
                   {ticket.resolution_summary}
                 </p>
                 {ticket.resolved_at && (
-                  <div style={{ fontSize: '0.75rem', color: '#059669', marginTop: 8 }}>
-                    Resolved on {new Date(ticket.resolved_at).toLocaleString()}
+                  <div className="data-mono" style={{ fontSize: '0.725rem', color: 'var(--ink-soft)', marginTop: 8 }}>
+                    Closed on {new Date(ticket.resolved_at).toLocaleString()}
                   </div>
                 )}
               </div>
             )}
           </div>
 
-          {/* Conversation Thread (Public vs Internal Notes) */}
+          {/* Conversation Thread */}
           <div className="card">
             <div className="card-header" style={{ marginBottom: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <MessageSquare size={18} color="#2563eb" />
-                <h3 className="card-title">Communication Thread</h3>
-                <span style={{ fontSize: '0.8rem', color: '#64748b' }}>({comments.length} entries)</span>
+                <MessageSquare size={17} color="var(--forest)" />
+                <h2 className="card-title">Ledger Correspondence Thread</h2>
+                <span className="meta-small">({comments.length} entries)</span>
               </div>
 
               {/* Internal Notes Filter for Staff */}
@@ -342,8 +397,8 @@ export default function TicketDetails({ ticketId, user, onBack }) {
             {/* Comment List */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 24 }}>
               {visibleComments.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: 24, color: '#94a3b8', fontSize: '0.875rem' }}>
-                  No replies posted in this section yet.
+                <div style={{ textAlign: 'center', padding: 28, color: 'var(--ink-soft)', fontSize: '0.85rem' }}>
+                  No official correspondence entered in this ledger thread yet.
                 </div>
               ) : (
                 visibleComments.map(c => {
@@ -353,48 +408,31 @@ export default function TicketDetails({ ticketId, user, onBack }) {
                       key={c.id}
                       style={{
                         padding: 16,
-                        borderRadius: 12,
-                        background: isInternal ? '#fffbeb' : '#f8fafc',
-                        border: `1px solid ${isInternal ? '#fde68a' : '#e2e8f0'}`,
+                        borderRadius: 2,
+                        background: isInternal ? 'rgba(216, 185, 121, 0.15)' : 'var(--paper)',
+                        border: `1px solid ${isInternal ? 'var(--brass)' : 'var(--hairline)'}`,
                         position: 'relative'
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                          <span style={{ fontWeight: 700, fontSize: '0.875rem', color: '#0f172a' }}>
+                          <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--ink)' }}>
                             {c.author_name}
                           </span>
-                          <span style={{
-                            fontSize: '0.7rem',
-                            fontWeight: 600,
-                            padding: '2px 8px',
-                            borderRadius: 12,
-                            background: c.author_role === 'student' ? '#eff6ff' : '#f5f3ff',
-                            color: c.author_role === 'student' ? '#1d4ed8' : '#6d28d9'
-                          }}>
+                          <span className={`role-tag role-tag-${c.author_role}`}>
                             {c.author_role.toUpperCase()}
                           </span>
                           {isInternal && (
-                            <span style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: 4,
-                              fontSize: '0.7rem',
-                              fontWeight: 700,
-                              color: '#b45309',
-                              background: '#fef3c7',
-                              padding: '2px 8px',
-                              borderRadius: 12
-                            }}>
-                              <Lock size={11} /> Internal Note
+                            <span className="stamp-badge stamp-high" style={{ fontSize: '0.65rem' }}>
+                              <Lock size={10} /> INTERNAL NOTE
                             </span>
                           )}
                         </div>
-                        <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                        <span className="data-mono" style={{ fontSize: '0.725rem', color: 'var(--ink-soft)' }}>
                           {new Date(c.created_at).toLocaleString()}
                         </span>
                       </div>
-                      <p style={{ fontSize: '0.9rem', color: '#334155', lineHeight: 1.5, margin: 0, whiteSpace: 'pre-wrap' }}>
+                      <p className="readable-measure" style={{ fontSize: '0.9rem', color: 'var(--ink)', margin: 0, whiteSpace: 'pre-wrap' }}>
                         {c.content}
                       </p>
                     </div>
@@ -407,15 +445,15 @@ export default function TicketDetails({ ticketId, user, onBack }) {
             <form onSubmit={handlePostComment}>
               <div className="form-group">
                 <label className="form-label">
-                  {isStaffOrAdmin ? 'Add Staff Reply / Internal Note' : 'Reply to Staff'}
+                  {isStaffOrAdmin ? 'Record Staff Reply or Internal Memorandum' : 'Reply to Registrar Staff'}
                 </label>
                 <textarea
                   className="form-control"
                   rows={3}
                   placeholder={
                     isStaffOrAdmin
-                      ? "Write a reply to the student, or record a private internal note for other staff members..."
-                      : "Type your message or response to the support staff..."
+                      ? "Write an official response to the student, or enter a private internal note for other staff members..."
+                      : "Type your reply or additional documentation for the registrar staff..."
                   }
                   value={commentText}
                   onChange={(e) => setCommentText(e.target.value)}
@@ -426,7 +464,7 @@ export default function TicketDetails({ ticketId, user, onBack }) {
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
                 {isStaffOrAdmin ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem', cursor: 'pointer', color: '#334155' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.825rem', cursor: 'pointer', color: 'var(--ink)' }}>
                       <input
                         type="radio"
                         name="visibility"
@@ -434,9 +472,9 @@ export default function TicketDetails({ ticketId, user, onBack }) {
                         checked={commentVisibility === 'public'}
                         onChange={() => setCommentVisibility('public')}
                       />
-                      Public Reply (Student can see)
+                      Public (Student can read)
                     </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.85rem', cursor: 'pointer', color: '#b45309', fontWeight: 600 }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.825rem', cursor: 'pointer', color: 'var(--brass)', fontWeight: 600 }}>
                       <input
                         type="radio"
                         name="visibility"
@@ -444,13 +482,13 @@ export default function TicketDetails({ ticketId, user, onBack }) {
                         checked={commentVisibility === 'internal'}
                         onChange={() => setCommentVisibility('internal')}
                       />
-                      <Lock size={13} />
+                      <Lock size={12} />
                       Internal Staff Note
                     </label>
                   </div>
                 ) : (
-                  <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                    Your reply will automatically notify the assigned support staff.
+                  <span className="meta-small">
+                    Your reply will automatically notify the assigned registrar staff.
                   </span>
                 )}
 
@@ -459,8 +497,8 @@ export default function TicketDetails({ ticketId, user, onBack }) {
                   className="btn btn-primary"
                   disabled={submittingComment || !commentText.trim()}
                 >
-                  <Send size={15} />
-                  {submittingComment ? 'Sending...' : 'Post Reply'}
+                  <Send size={14} />
+                  {submittingComment ? 'Logging...' : 'Post Reply'}
                 </button>
               </div>
             </form>
@@ -471,33 +509,33 @@ export default function TicketDetails({ ticketId, user, onBack }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {/* Ticket Metadata Card */}
           <div className="card">
-            <h3 className="card-title" style={{ fontSize: '1rem', marginBottom: 14 }}>
-              Request Details
-            </h3>
+            <h2 className="card-title" style={{ fontSize: '1rem', marginBottom: 14 }}>
+              Inquiry Dossier
+            </h2>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontSize: '0.85rem' }}>
               <div>
-                <span style={{ color: '#64748b', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600 }}>
+                <span className="meta-small" style={{ textTransform: 'uppercase', display: 'block', fontSize: '0.7rem' }}>
                   Student Requester
                 </span>
-                <span style={{ fontWeight: 700, color: '#0f172a' }}>{ticket.requester_name}</span>
-                <div style={{ color: '#64748b', fontSize: '0.8rem' }}>
+                <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{ticket.requester_name}</span>
+                <div className="data-mono" style={{ color: 'var(--ink-soft)', fontSize: '0.75rem' }}>
                   {ticket.requester_identifier ? `ID: ${ticket.requester_identifier} • ` : ''}{ticket.requester_email}
                 </div>
               </div>
 
-              <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: 10 }}>
-                <span style={{ color: '#64748b', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600 }}>
+              <div style={{ borderTop: '1px solid var(--hairline)', paddingTop: 10 }}>
+                <span className="meta-small" style={{ textTransform: 'uppercase', display: 'block', fontSize: '0.7rem' }}>
                   Assigned Staff
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontWeight: 600, color: ticket.assignee_name ? '#0f172a' : '#94a3b8' }}>
+                  <span style={{ fontWeight: 600, color: ticket.assignee_name ? 'var(--ink)' : 'var(--ink-soft)' }}>
                     {ticket.assignee_name || 'Unassigned'}
                   </span>
                   {isStaffOrAdmin && (
                     <button
                       onClick={() => setIsAssignOpen(true)}
-                      style={{ background: 'none', border: 'none', color: '#2563eb', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
+                      style={{ background: 'none', border: 'none', color: 'var(--forest)', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}
                     >
                       Change
                     </button>
@@ -505,38 +543,42 @@ export default function TicketDetails({ ticketId, user, onBack }) {
                 </div>
               </div>
 
-              <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: 10 }}>
-                <span style={{ color: '#64748b', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600 }}>
+              <div style={{ borderTop: '1px solid var(--hairline)', paddingTop: 10 }}>
+                <span className="meta-small" style={{ textTransform: 'uppercase', display: 'block', fontSize: '0.7rem' }}>
                   Category & Department
                 </span>
-                <span style={{ fontWeight: 600, color: '#0f172a' }}>{ticket.category_name}</span>
-                <div style={{ color: '#64748b', fontSize: '0.8rem' }}>{ticket.department_name || 'General'}</div>
+                <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{ticket.category_name}</span>
+                <div className="meta-small">{ticket.department_name || 'General Records'}</div>
               </div>
 
-              <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: 10 }}>
-                <span style={{ color: '#64748b', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 600 }}>
+              <div style={{ borderTop: '1px solid var(--hairline)', paddingTop: 10 }}>
+                <span className="meta-small" style={{ textTransform: 'uppercase', display: 'block', fontSize: '0.7rem' }}>
                   Creation Timestamp
                 </span>
-                <span style={{ color: '#334155' }}>{new Date(ticket.created_at).toLocaleString()}</span>
+                <span className="data-mono" style={{ color: 'var(--ink)' }}>
+                  {new Date(ticket.created_at).toLocaleString()}
+                </span>
               </div>
 
               {ticket.reopen_count > 0 && (
-                <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: 10 }}>
-                  <span style={{ color: '#b45309', display: 'block', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 700 }}>
-                    Reopen Count
+                <div style={{ borderTop: '1px solid var(--hairline)', paddingTop: 10 }}>
+                  <span className="meta-small" style={{ color: 'var(--brass)', textTransform: 'uppercase', display: 'block', fontSize: '0.7rem', fontWeight: 700 }}>
+                    Reopened
                   </span>
-                  <span style={{ fontWeight: 700, color: '#b45309' }}>{ticket.reopen_count} time(s)</span>
+                  <span className="data-mono" style={{ fontWeight: 700, color: 'var(--brass)' }}>
+                    {ticket.reopen_count} time(s)
+                  </span>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Audit History Timeline (FR-010, FR-056) */}
+          {/* Audit History Timeline */}
           <div className="card">
             <div className="card-header" style={{ marginBottom: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <History size={16} color="#64748b" />
-                <h3 className="card-title" style={{ fontSize: '1rem' }}>Activity History</h3>
+                <History size={16} color="var(--forest)" />
+                <h2 className="card-title" style={{ fontSize: '1rem' }}>Ledger Activity Log</h2>
               </div>
             </div>
 
@@ -545,11 +587,11 @@ export default function TicketDetails({ ticketId, user, onBack }) {
                 <div key={item.id} className="timeline-item">
                   <div className="timeline-dot" />
                   <div className="timeline-content">
-                    <div style={{ fontWeight: 600, color: '#0f172a', fontSize: '0.825rem' }}>
+                    <div style={{ fontWeight: 600, color: 'var(--ink)', fontSize: '0.825rem' }}>
                       {item.description}
                     </div>
-                    <div style={{ fontSize: '0.725rem', color: '#64748b', marginTop: 2 }}>
-                      By {item.actor_name || 'System'} • {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, {new Date(item.created_at).toLocaleDateString()}
+                    <div className="timeline-time">
+                      By {item.actor_name || 'Registrar'} • {new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, {new Date(item.created_at).toLocaleDateString()}
                     </div>
                   </div>
                 </div>

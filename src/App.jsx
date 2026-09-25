@@ -95,18 +95,24 @@ export default function App() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f8fafc',
-        color: '#64748b',
-        fontFamily: 'var(--font-family)'
+        backgroundColor: 'var(--paper)',
+        color: 'var(--ink-soft)',
+        fontFamily: 'var(--font-body)'
       }}>
-        Initializing CampusCare...
+        <div className="grain-overlay" aria-hidden="true" />
+        <span className="data-mono">Opening Registrar Ledger...</span>
       </div>
     );
   }
 
   // Not authenticated -> Show Login Screen 1
   if (!user) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
+    return (
+      <>
+        <div className="grain-overlay" aria-hidden="true" />
+        <Login onLoginSuccess={handleLoginSuccess} />
+      </>
+    );
   }
 
   // Render the appropriate main view
@@ -169,6 +175,7 @@ export default function App() {
 
   return (
     <div className="app-container">
+      <div className="grain-overlay" aria-hidden="true" />
       <Sidebar
         currentView={currentView}
         setView={(v) => {

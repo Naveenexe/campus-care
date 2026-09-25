@@ -61,24 +61,27 @@ export default function AssignModal({ ticket, isOpen, onClose, onAssigned }) {
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
-              width: 34,
-              height: 34,
-              borderRadius: 8,
-              backgroundColor: '#eff6ff',
-              color: '#2563eb',
+              width: 32,
+              height: 32,
+              borderRadius: 4,
+              backgroundColor: 'var(--paper)',
+              color: 'var(--forest)',
+              border: '1px solid var(--hairline)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <UserCheck size={18} />
+              <UserCheck size={17} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0 }}>Assign Ticket</h3>
-              <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0 }}>{ticket.ticket_number}</p>
+              <h2 className="modal-title" style={{ fontSize: '1.15rem' }}>Assign Staff Officer</h2>
+              <p className="data-mono" style={{ fontSize: '0.75rem', color: 'var(--ink-soft)', margin: 0 }}>
+                {ticket.ticket_number}
+              </p>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
-            <X size={20} />
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)' }}>
+            <X size={18} />
           </button>
         </div>
 
@@ -88,39 +91,32 @@ export default function AssignModal({ ticket, isOpen, onClose, onAssigned }) {
 
             {recommended && (
               <div style={{
-                background: '#f0fdf4',
-                border: '1px solid #bbf7d0',
-                borderRadius: 10,
+                background: 'rgba(92, 122, 82, 0.1)',
+                border: '1px solid var(--sage)',
+                borderRadius: 2,
                 padding: '12px 14px',
                 marginBottom: 18,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                gap: 12
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Sparkles size={16} color="#16a34a" />
+                  <Sparkles size={16} color="var(--sage)" />
                   <div>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#15803d' }}>
-                      Recommended Staff Member
+                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--sage)' }}>
+                      Designated Recommendation
                     </div>
-                    <div style={{ fontSize: '0.85rem', color: '#166534' }}>
-                      {recommended.full_name} ({recommended.department_name || 'General'}) • {recommended.active_workload} active tickets
+                    <div style={{ fontSize: '0.825rem', color: 'var(--ink)' }}>
+                      {recommended.full_name} ({recommended.department_name || 'General'}) • {recommended.active_workload} active inquiries
                     </div>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedStaffId(String(recommended.id))}
-                  style={{
-                    background: '#ffffff',
-                    border: '1px solid #86efac',
-                    padding: '4px 10px',
-                    borderRadius: 6,
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    color: '#15803d',
-                    cursor: 'pointer'
-                  }}
+                  className="btn btn-secondary btn-sm"
+                  style={{ borderColor: 'var(--sage)', color: 'var(--sage)' }}
                 >
                   Apply
                 </button>
@@ -135,10 +131,10 @@ export default function AssignModal({ ticket, isOpen, onClose, onAssigned }) {
                 onChange={(e) => setSelectedStaffId(e.target.value)}
                 disabled={loading}
               >
-                <option value="">-- Choose Staff Member --</option>
+                <option value="">-- Choose Assigned Officer --</option>
                 {staffList.map(s => (
                   <option key={s.id} value={s.id}>
-                    {s.full_name} ({s.department_name || 'No Dept'}) - {s.active_workload || 0} active tickets
+                    {s.full_name} ({s.department_name || 'General Records'}) — {s.active_workload || 0} active tickets
                   </option>
                 ))}
               </select>

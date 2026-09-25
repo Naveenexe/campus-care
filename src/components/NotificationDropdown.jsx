@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, Check, ExternalLink } from 'lucide-react';
+import { Bell, Check } from 'lucide-react';
 import { api } from '../api';
 
 export default function NotificationDropdown({ onSelectTicket }) {
@@ -74,37 +74,38 @@ export default function NotificationDropdown({ onSelectTicket }) {
         onClick={() => setIsOpen(!isOpen)}
         style={{
           position: 'relative',
-          background: isOpen ? '#f1f5f9' : '#ffffff',
-          border: '1px solid #e2e8f0',
-          borderRadius: 8,
-          width: 38,
-          height: 38,
+          background: isOpen ? 'var(--paper)' : 'var(--paper-raised)',
+          border: '1px solid var(--hairline)',
+          borderRadius: 'var(--radius-input)',
+          width: 36,
+          height: 36,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
-          color: '#475569',
-          transition: 'all 0.15s ease'
+          color: 'var(--ink)',
+          boxShadow: 'var(--shadow-offset-sm)'
         }}
-        title="Notifications"
+        title="Official Desk Notifications"
       >
-        <Bell size={18} />
+        <Bell size={17} />
         {unreadCount > 0 && (
           <span style={{
             position: 'absolute',
             top: -4,
             right: -4,
-            background: '#ef4444',
-            color: '#ffffff',
-            fontSize: '0.7rem',
+            background: 'var(--oxblood)',
+            color: 'var(--paper)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: '0.65rem',
             fontWeight: 700,
             borderRadius: '50%',
-            width: 18,
-            height: 18,
+            width: 17,
+            height: 17,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 0 0 2px #ffffff'
+            boxShadow: '0 0 0 2px var(--paper-raised)'
           }}>
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
@@ -117,23 +118,23 @@ export default function NotificationDropdown({ onSelectTicket }) {
           top: 'calc(100% + 8px)',
           right: 0,
           width: 340,
-          background: '#ffffff',
-          borderRadius: 12,
-          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-          border: '1px solid #e2e8f0',
+          background: 'var(--paper-raised)',
+          borderRadius: 'var(--radius-modal)',
+          boxShadow: 'var(--shadow-offset-lg)',
+          border: '1px solid var(--hairline)',
           zIndex: 50,
           overflow: 'hidden'
         }}>
           <div style={{
             padding: '12px 16px',
-            borderBottom: '1px solid #f1f5f9',
+            borderBottom: '1px solid var(--hairline)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            background: '#f8fafc'
+            background: 'var(--paper)'
           }}>
-            <span style={{ fontWeight: 700, fontSize: '0.875rem', color: '#0f172a' }}>
-              Notifications {unreadCount > 0 && `(${unreadCount} new)`}
+            <span style={{ fontWeight: 600, fontSize: '0.85rem', color: 'var(--ink)', fontFamily: 'var(--font-display)' }}>
+              Ledger Notices {unreadCount > 0 && `(${unreadCount} pending)`}
             </span>
             {unreadCount > 0 && (
               <button
@@ -141,7 +142,7 @@ export default function NotificationDropdown({ onSelectTicket }) {
                 style={{
                   background: 'transparent',
                   border: 'none',
-                  color: '#2563eb',
+                  color: 'var(--forest)',
                   fontSize: '0.75rem',
                   fontWeight: 600,
                   cursor: 'pointer'
@@ -154,8 +155,8 @@ export default function NotificationDropdown({ onSelectTicket }) {
 
           <div style={{ maxHeight: 360, overflowY: 'auto' }}>
             {notifications.length === 0 ? (
-              <div style={{ padding: '24px 16px', textAlign: 'center', color: '#94a3b8', fontSize: '0.85rem' }}>
-                No notifications right now
+              <div style={{ padding: '24px 16px', textAlign: 'center', color: 'var(--ink-soft)', fontSize: '0.85rem' }}>
+                No active ledger notifications recorded.
               </div>
             ) : (
               notifications.map(n => (
@@ -164,27 +165,27 @@ export default function NotificationDropdown({ onSelectTicket }) {
                   onClick={() => handleItemClick(n)}
                   style={{
                     padding: '12px 16px',
-                    borderBottom: '1px solid #f1f5f9',
-                    background: n.is_read ? '#ffffff' : '#f0f7ff',
+                    borderBottom: '1px solid var(--hairline)',
+                    background: n.is_read ? 'var(--paper-raised)' : 'rgba(216, 185, 121, 0.12)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'flex-start',
                     gap: 10,
-                    transition: 'background 0.15s ease'
+                    transition: 'background 0.1s ease'
                   }}
                 >
                   <div style={{
                     width: 7,
                     height: 7,
                     borderRadius: '50%',
-                    backgroundColor: n.is_read ? 'transparent' : '#2563eb',
+                    backgroundColor: n.is_read ? 'transparent' : 'var(--brass)',
                     marginTop: 6,
                     flexShrink: 0
                   }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{
                       fontSize: '0.825rem',
-                      color: n.is_read ? '#475569' : '#0f172a',
+                      color: 'var(--ink)',
                       fontWeight: n.is_read ? 400 : 600,
                       lineHeight: 1.4,
                       margin: 0
@@ -192,12 +193,12 @@ export default function NotificationDropdown({ onSelectTicket }) {
                       {n.message}
                     </p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                      <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                      <span className="data-mono" style={{ fontSize: '0.7rem', color: 'var(--ink-soft)' }}>
                         {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       {n.ticket_number && (
-                        <span style={{ fontSize: '0.7rem', color: '#2563eb', fontWeight: 600 }}>
-                          #{n.ticket_number}
+                        <span className="data-mono" style={{ fontSize: '0.7rem', color: 'var(--forest)', fontWeight: 600 }}>
+                          {n.ticket_number}
                         </span>
                       )}
                     </div>
@@ -209,7 +210,7 @@ export default function NotificationDropdown({ onSelectTicket }) {
                       style={{
                         background: 'transparent',
                         border: 'none',
-                        color: '#94a3b8',
+                        color: 'var(--ink-soft)',
                         cursor: 'pointer',
                         padding: 2
                       }}

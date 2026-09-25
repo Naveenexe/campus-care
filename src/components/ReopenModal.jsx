@@ -12,7 +12,7 @@ export default function ReopenModal({ ticket, isOpen, onClose, onReopened }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!reason.trim() || reason.trim().length < 5) {
-      setError('Please provide a reason of at least 5 characters for reopening the ticket.');
+      setError('Please provide an explanation of at least 5 characters for reopening the ticket.');
       return;
     }
 
@@ -35,24 +35,27 @@ export default function ReopenModal({ ticket, isOpen, onClose, onReopened }) {
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
-              width: 34,
-              height: 34,
-              borderRadius: 8,
-              backgroundColor: '#fffbeb',
-              color: '#d97706',
+              width: 32,
+              height: 32,
+              borderRadius: 4,
+              backgroundColor: 'var(--paper)',
+              color: 'var(--brass)',
+              border: '1px solid var(--hairline)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <RefreshCw size={18} />
+              <RefreshCw size={17} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0 }}>Reopen Ticket</h3>
-              <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0 }}>{ticket.ticket_number}</p>
+              <h2 className="modal-title" style={{ fontSize: '1.15rem' }}>Reopen Inquiry Case</h2>
+              <p className="data-mono" style={{ fontSize: '0.75rem', color: 'var(--ink-soft)', margin: 0 }}>
+                {ticket.ticket_number}
+              </p>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
-            <X size={20} />
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)' }}>
+            <X size={18} />
           </button>
         </div>
 
@@ -60,17 +63,17 @@ export default function ReopenModal({ ticket, isOpen, onClose, onReopened }) {
           <div className="modal-body">
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <p style={{ fontSize: '0.875rem', color: '#475569', marginBottom: 16 }}>
-              If your request was not completely addressed, state what remains unresolved so staff can assist you further.
+            <p style={{ fontSize: '0.85rem', color: 'var(--ink-soft)', marginBottom: 16 }}>
+              If your request was not adequately resolved, state what remains outstanding so the registrar desk can reassign or review your file.
             </p>
 
             <div className="form-group">
               <label className="form-label">
-                Reason for Reopening <span style={{ color: '#ef4444' }}>*</span>
+                Reason for Reopening Inquiry <span style={{ color: 'var(--oxblood)' }}>*</span>
               </label>
               <textarea
                 className="form-control"
-                placeholder="Example: The updated marksheet still does not reflect the change in subject CS302..."
+                placeholder="Example: The updated transcript still does not reflect the grade correction for course CS302..."
                 rows={4}
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
@@ -84,7 +87,7 @@ export default function ReopenModal({ ticket, isOpen, onClose, onReopened }) {
               Cancel
             </button>
             <button type="submit" className="btn btn-primary" disabled={submitting || reason.trim().length < 5}>
-              {submitting ? 'Reopening...' : 'Reopen Ticket'}
+              {submitting ? 'Reopening Case...' : 'Submit Reopen Request'}
             </button>
           </div>
         </form>

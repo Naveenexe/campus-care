@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { GraduationCap, Lock, Mail, User, Shield, ArrowRight, UserPlus, KeyRound } from 'lucide-react';
+import { Landmark, Lock, Mail, UserPlus, KeyRound, Shield, User, GraduationCap } from 'lucide-react';
 import { api, setToken, setStoredUser } from '../api';
 
 export default function Login({ onLoginSuccess }) {
+  const [activeRoleTab, setActiveRoleTab] = useState('admin'); // 'student', 'staff', 'admin'
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState('admin@campuscare.edu');
   const [password, setPassword] = useState('Password@123');
@@ -16,6 +17,22 @@ export default function Login({ onLoginSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Handle Role Tab Switching
+  const handleRoleTabClick = (role) => {
+    setActiveRoleTab(role);
+    setError('');
+    if (role === 'admin') {
+      setEmail('admin@campuscare.edu');
+      setPassword('Password@123');
+    } else if (role === 'staff') {
+      setEmail('it.staff@campuscare.edu');
+      setPassword('Password@123');
+    } else {
+      setEmail('rahul.sharma@student.edu');
+      setPassword('Password@123');
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
@@ -27,7 +44,7 @@ export default function Login({ onLoginSuccess }) {
       setStoredUser(data.user);
       onLoginSuccess(data.user);
     } catch (err) {
-      setError(err.message || 'Login failed');
+      setError(err.message || 'Authentication credentials could not be verified by the Registrar.');
     } finally {
       setLoading(false);
     }
@@ -42,7 +59,7 @@ export default function Login({ onLoginSuccess }) {
       setStoredUser(data.user);
       onLoginSuccess(data.user);
     } catch (err) {
-      setError(err.message || 'Demo login failed');
+      setError(err.message || 'Demo ledger sign-in failed');
     } finally {
       setLoading(false);
     }
@@ -64,7 +81,7 @@ export default function Login({ onLoginSuccess }) {
       setStoredUser(data.user);
       onLoginSuccess(data.user);
     } catch (err) {
-      setError(err.message || 'Registration failed');
+      setError(err.message || 'Student registration record could not be established.');
     } finally {
       setLoading(false);
     }
@@ -76,62 +93,211 @@ export default function Login({ onLoginSuccess }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
-      padding: 20
+      backgroundColor: 'var(--paper)',
+      padding: '32px 16px',
+      position: 'relative'
     }}>
+      {/* Centered Registrar's Ledger Card (solid --forest cover) */}
       <div style={{
         width: '100%',
-        maxWidth: 500,
-        background: '#ffffff',
-        borderRadius: 20,
-        boxShadow: '0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05)',
-        border: '1px solid #e2e8f0',
+        maxWidth: 520,
+        backgroundColor: 'var(--forest)',
+        color: 'var(--paper)',
+        borderRadius: 4,
+        boxShadow: 'var(--shadow-offset-lg), 0 12px 30px rgba(15, 25, 20, 0.4)',
+        border: '2px solid var(--brass)',
+        outline: '1px solid rgba(216, 185, 121, 0.35)',
+        outlineOffset: '-6px',
+        position: 'relative',
         overflow: 'hidden'
       }}>
-        {/* Header Branding */}
+        {/* Ledger Header / Letterhead */}
         <div style={{
-          padding: '36px 36px 24px',
+          padding: '40px 36px 20px',
           textAlign: 'center',
-          background: 'linear-gradient(180deg, #eff6ff 0%, #ffffff 100%)',
-          borderBottom: '1px solid #f1f5f9'
+          borderBottom: '1px solid rgba(201, 194, 172, 0.25)',
+          position: 'relative'
         }}>
+          {/* Official Emblem */}
           <div style={{
-            width: 54,
-            height: 54,
-            margin: '0 auto 16px',
-            borderRadius: 14,
-            background: 'linear-gradient(135deg, #2563eb, #4f46e5)',
+            width: 48,
+            height: 48,
+            margin: '0 auto 14px',
+            borderRadius: '50%',
+            border: '2px solid var(--brass-soft)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#ffffff',
-            boxShadow: '0 10px 15px -3px rgba(37, 99, 235, 0.3)'
+            color: 'var(--brass-soft)',
+            background: 'rgba(0, 0, 0, 0.2)'
           }}>
-            <GraduationCap size={30} />
+            <Landmark size={24} strokeWidth={2} />
           </div>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em' }}>
+
+          <div style={{
+            fontSize: '0.725rem',
+            fontFamily: 'var(--font-mono)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.12em',
+            color: 'var(--brass-soft)',
+            marginBottom: 4
+          }}>
+            OFFICE OF THE REGISTRAR & SUPPORT
+          </div>
+
+          {/* Fraunces Wordmark */}
+          <h1 style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '2.2rem',
+            fontWeight: 500,
+            color: 'var(--paper-raised)',
+            letterSpacing: '-0.02em',
+            lineHeight: 1.1,
+            margin: '0 0 6px'
+          }}>
             CampusCare
           </h1>
-          <p style={{ fontSize: '0.875rem', color: '#64748b', marginTop: 4 }}>
-            Student Support & Administrative Ticket Management
+
+          <p style={{
+            fontSize: '0.85rem',
+            color: 'var(--paper)',
+            opacity: 0.85,
+            fontFamily: 'var(--font-body)',
+            maxWidth: 380,
+            margin: '0 auto'
+          }}>
+            Administrative records office, student ticket lifecycle, and SLA tracking registry.
           </p>
         </div>
 
-        <div style={{ padding: '28px 36px' }}>
-          {error && <div className="alert alert-danger">{error}</div>}
+        {/* Form Body */}
+        <div style={{ padding: '28px 36px 36px' }}>
+          {error && (
+            <div className="alert alert-danger" style={{ background: 'var(--paper-raised)', color: 'var(--oxblood)', marginBottom: 20 }}>
+              {error}
+            </div>
+          )}
+
+          {/* Three Stamped Tabs Role Picker */}
+          <div style={{ marginBottom: 24 }}>
+            <div style={{
+              fontSize: '0.7rem',
+              fontFamily: 'var(--font-mono)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.08em',
+              color: 'var(--brass-soft)',
+              marginBottom: 8,
+              textAlign: 'center'
+            }}>
+              SELECT DESK ROLE RECORD
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr',
+              gap: 8,
+              background: 'rgba(0, 0, 0, 0.2)',
+              padding: 6,
+              borderRadius: 3,
+              border: '1px solid rgba(201, 194, 172, 0.2)'
+            }}>
+              <button
+                type="button"
+                onClick={() => handleRoleTabClick('student')}
+                style={{
+                  background: activeRoleTab === 'student' ? 'var(--paper-raised)' : 'transparent',
+                  color: activeRoleTab === 'student' ? 'var(--ink)' : 'var(--paper)',
+                  border: activeRoleTab === 'student' ? '1.5px dashed var(--slate)' : '1px solid transparent',
+                  padding: '8px 4px',
+                  borderRadius: 2,
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 5,
+                  boxShadow: activeRoleTab === 'student' ? '1px 1px 0 var(--ink)' : 'none',
+                  transition: 'all 0.12s ease'
+                }}
+              >
+                <GraduationCap size={13} />
+                Student
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleRoleTabClick('staff')}
+                style={{
+                  background: activeRoleTab === 'staff' ? 'var(--paper-raised)' : 'transparent',
+                  color: activeRoleTab === 'staff' ? 'var(--ink)' : 'var(--paper)',
+                  border: activeRoleTab === 'staff' ? '1.5px dashed var(--forest)' : '1px solid transparent',
+                  padding: '8px 4px',
+                  borderRadius: 2,
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 5,
+                  boxShadow: activeRoleTab === 'staff' ? '1px 1px 0 var(--ink)' : 'none',
+                  transition: 'all 0.12s ease'
+                }}
+              >
+                <User size={13} />
+                Staff
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleRoleTabClick('admin')}
+                style={{
+                  background: activeRoleTab === 'admin' ? 'var(--paper-raised)' : 'transparent',
+                  color: activeRoleTab === 'admin' ? 'var(--ink)' : 'var(--paper)',
+                  border: activeRoleTab === 'admin' ? '1.5px dashed var(--brass)' : '1px solid transparent',
+                  padding: '8px 4px',
+                  borderRadius: 2,
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '0.75rem',
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 5,
+                  boxShadow: activeRoleTab === 'admin' ? '1px 1px 0 var(--ink)' : 'none',
+                  transition: 'all 0.12s ease'
+                }}
+              >
+                <Shield size={13} />
+                Admin
+              </button>
+            </div>
+          </div>
 
           {!isRegister ? (
             /* Login Form */
             <form onSubmit={handleLogin}>
               <div className="form-group">
-                <label className="form-label">Email or Username</label>
+                <label className="form-label" style={{ color: 'var(--paper)' }}>
+                  Institutional Email
+                </label>
                 <div style={{ position: 'relative' }}>
-                  <Mail size={16} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
+                  <Mail size={16} style={{ position: 'absolute', left: 12, top: 12, color: 'var(--ink-soft)' }} />
                   <input
                     type="email"
                     className="form-control"
                     style={{ paddingLeft: 38 }}
-                    placeholder="name@institution.edu"
+                    placeholder="name@campuscare.edu"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -140,14 +306,16 @@ export default function Login({ onLoginSuccess }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Password</label>
+                <label className="form-label" style={{ color: 'var(--paper)' }}>
+                  Password
+                </label>
                 <div style={{ position: 'relative' }}>
-                  <Lock size={16} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
+                  <Lock size={16} style={{ position: 'absolute', left: 12, top: 12, color: 'var(--ink-soft)' }} />
                   <input
                     type="password"
                     className="form-control"
                     style={{ paddingLeft: 38 }}
-                    placeholder="Enter password"
+                    placeholder="Enter ledger password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -161,15 +329,16 @@ export default function Login({ onLoginSuccess }) {
                 style={{ width: '100%', marginTop: 8 }}
                 disabled={loading}
               >
-                {loading ? 'Authenticating...' : 'Sign In'}
-                <ArrowRight size={16} />
+                {loading ? 'Authenticating with Registrar...' : `Sign In as ${activeRoleTab.toUpperCase()}`}
               </button>
             </form>
           ) : (
             /* Student Registration Form */
             <form onSubmit={handleRegister}>
               <div className="form-group">
-                <label className="form-label">Full Name</label>
+                <label className="form-label" style={{ color: 'var(--paper)' }}>
+                  Student Full Name
+                </label>
                 <input
                   type="text"
                   className="form-control"
@@ -181,7 +350,9 @@ export default function Login({ onLoginSuccess }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Student ID / Roll Number</label>
+                <label className="form-label" style={{ color: 'var(--paper)' }}>
+                  Student ID / Roll Number
+                </label>
                 <input
                   type="text"
                   className="form-control"
@@ -193,7 +364,9 @@ export default function Login({ onLoginSuccess }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Student Email</label>
+                <label className="form-label" style={{ color: 'var(--paper)' }}>
+                  Student Email
+                </label>
                 <input
                   type="email"
                   className="form-control"
@@ -205,7 +378,9 @@ export default function Login({ onLoginSuccess }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Password</label>
+                <label className="form-label" style={{ color: 'var(--paper)' }}>
+                  Password
+                </label>
                 <input
                   type="password"
                   className="form-control"
@@ -222,47 +397,49 @@ export default function Login({ onLoginSuccess }) {
                 style={{ width: '100%', marginTop: 8 }}
                 disabled={loading}
               >
-                {loading ? 'Creating Account...' : 'Complete Registration'}
+                {loading ? 'Entering in Student Register...' : 'Complete Registration'}
                 <UserPlus size={16} />
               </button>
             </form>
           )}
 
-          <div style={{ textAlign: 'center', marginTop: 16 }}>
+          <div style={{ textAlign: 'center', marginTop: 18 }}>
             <button
               type="button"
               onClick={() => { setIsRegister(!isRegister); setError(''); }}
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#2563eb',
+                color: 'var(--brass-soft)',
                 fontSize: '0.85rem',
-                fontWeight: 600,
-                cursor: 'pointer'
+                fontWeight: 500,
+                cursor: 'pointer',
+                textDecoration: 'underline'
               }}
             >
-              {isRegister ? 'Already registered? Return to Login' : "New Student? Register here"}
+              {isRegister ? 'Already registered? Return to Sign In' : 'New student enrollee? Register ledger record here'}
             </button>
           </div>
 
-          {/* One-Click Demo Access Section */}
+          {/* Quick-Access Stamped Demo Logins */}
           <div style={{
             marginTop: 24,
-            paddingTop: 20,
-            borderTop: '1px dashed #cbd5e1'
+            paddingTop: 18,
+            borderTop: '1px dashed rgba(201, 194, 172, 0.25)'
           }}>
             <div style={{
               display: 'flex',
               alignItems: 'center',
               gap: 6,
-              fontSize: '0.75rem',
-              fontWeight: 700,
-              color: '#64748b',
+              fontSize: '0.7rem',
+              fontWeight: 600,
+              color: 'var(--brass-soft)',
               textTransform: 'uppercase',
+              letterSpacing: '0.06em',
               marginBottom: 10
             }}>
-              <KeyRound size={13} color="#2563eb" />
-              One-Click Evaluation Demo Logins
+              <KeyRound size={13} color="var(--brass-soft)" />
+              Instant Evaluation Access
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -270,44 +447,68 @@ export default function Login({ onLoginSuccess }) {
                 type="button"
                 className="btn btn-secondary btn-sm"
                 onClick={() => handleDemoQuickLogin('admin@campuscare.edu')}
-                style={{ justifyContent: 'flex-start', fontSize: '0.775rem' }}
+                style={{
+                  justifyContent: 'flex-start',
+                  fontSize: '0.75rem',
+                  color: 'var(--paper)',
+                  borderColor: 'rgba(201, 194, 172, 0.35)',
+                  background: 'rgba(0, 0, 0, 0.15)'
+                }}
               >
-                <Shield size={13} color="#1d4ed8" />
-                <span>Admin / Registrar</span>
-              </button>
-
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => handleDemoQuickLogin('finance.staff@campuscare.edu')}
-                style={{ justifyContent: 'flex-start', fontSize: '0.775rem' }}
-              >
-                <User size={13} color="#6d28d9" />
-                <span>Staff: Accounts</span>
+                <Shield size={13} color="var(--brass)" />
+                <span>Admin Registrar</span>
               </button>
 
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"
                 onClick={() => handleDemoQuickLogin('it.staff@campuscare.edu')}
-                style={{ justifyContent: 'flex-start', fontSize: '0.775rem' }}
+                style={{
+                  justifyContent: 'flex-start',
+                  fontSize: '0.75rem',
+                  color: 'var(--paper)',
+                  borderColor: 'rgba(201, 194, 172, 0.35)',
+                  background: 'rgba(0, 0, 0, 0.15)'
+                }}
               >
-                <User size={13} color="#6d28d9" />
+                <User size={13} color="var(--paper-raised)" />
                 <span>Staff: IT Support</span>
               </button>
 
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"
-                onClick={() => handleDemoQuickLogin('rahul.sharma@student.edu')}
-                style={{ justifyContent: 'flex-start', fontSize: '0.775rem' }}
+                onClick={() => handleDemoQuickLogin('finance.staff@campuscare.edu')}
+                style={{
+                  justifyContent: 'flex-start',
+                  fontSize: '0.75rem',
+                  color: 'var(--paper)',
+                  borderColor: 'rgba(201, 194, 172, 0.35)',
+                  background: 'rgba(0, 0, 0, 0.15)'
+                }}
               >
-                <GraduationCap size={13} color="#059669" />
+                <User size={13} color="var(--paper-raised)" />
+                <span>Staff: Accounts</span>
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => handleDemoQuickLogin('rahul.sharma@student.edu')}
+                style={{
+                  justifyContent: 'flex-start',
+                  fontSize: '0.75rem',
+                  color: 'var(--paper)',
+                  borderColor: 'rgba(201, 194, 172, 0.35)',
+                  background: 'rgba(0, 0, 0, 0.15)'
+                }}
+              >
+                <GraduationCap size={13} color="var(--slate)" />
                 <span>Student: Rahul</span>
               </button>
             </div>
-            <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: 6, textAlign: 'center' }}>
-              Standard password for manual login: <code>Password@123</code>
+            <div className="data-mono" style={{ fontSize: '0.7rem', color: 'rgba(237, 235, 224, 0.65)', marginTop: 8, textAlign: 'center' }}>
+              Standard ledger password: Password@123
             </div>
           </div>
         </div>

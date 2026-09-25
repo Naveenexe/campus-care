@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Search,
-  Filter,
   PlusCircle,
   Clock,
   ArrowUpDown,
-  ChevronLeft,
-  ChevronRight,
   RotateCcw,
   Download,
 } from 'lucide-react';
@@ -101,7 +98,7 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
       <div className="page-header">
         <div>
           <h1 className="page-title">
-            {user?.role === 'student' ? 'My Support Requests' : 'Central Ticket Management'}
+            {user?.role === 'student' ? 'My Support Requests' : 'Central Ticket Registry'}
           </h1>
           <p className="page-subtitle">
             Search, filter, prioritize, and track support requests across all departments with SLA monitoring.
@@ -116,8 +113,8 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
               download
               title="Export filtered data to CSV"
             >
-              <Download size={16} />
-              Export CSV
+              <Download size={15} />
+              Export Ledger (CSV)
             </a>
           )}
           {['student', 'admin'].includes(user?.role) && (
@@ -135,13 +132,13 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
       {/* Filter and Search Bar Card */}
       <div className="card" style={{ marginBottom: 20, padding: 18 }}>
         <form onSubmit={handleSearchSubmit} style={{ display: 'flex', gap: 12, marginBottom: 14, flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', flex: 1, minWidth: 240 }}>
-            <Search size={16} style={{ position: 'absolute', left: 12, top: 12, color: '#94a3b8' }} />
+          <div style={{ position: 'relative', flex: 1, minWidth: 260 }}>
+            <Search size={16} style={{ position: 'absolute', left: 12, top: 11, color: 'var(--ink-soft)' }} />
             <input
               type="text"
               className="form-control"
               style={{ paddingLeft: 38 }}
-              placeholder="Search by ticket ID (e.g. CC-2026-00101), subject, or requester..."
+              placeholder="Search by ticket ID (e.g. CC-2026-00101), subject, or student name..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -150,13 +147,13 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
             Search
           </button>
           <button type="button" className="btn btn-secondary" onClick={handleResetFilters} title="Reset all filters">
-            <RotateCcw size={15} />
+            <RotateCcw size={14} />
             Reset
           </button>
         </form>
 
-        {/* Filter Pills row */}
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+        {/* Filter Selects */}
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
           {/* Status Filter */}
           <div style={{ minWidth: 140 }}>
             <select
@@ -240,13 +237,13 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
           )}
 
           {/* Result Count */}
-          <span style={{ fontSize: '0.8rem', color: '#64748b', marginLeft: 'auto' }}>
-            Showing <strong>{tickets.length}</strong> of <strong>{pagination.total}</strong> tickets
+          <span className="data-mono" style={{ fontSize: '0.75rem', color: 'var(--ink-soft)', marginLeft: 'auto' }}>
+            Showing <strong>{tickets.length}</strong> of <strong>{pagination.total}</strong> records
           </span>
         </div>
       </div>
 
-      {/* Main Tickets Table */}
+      {/* Main Ruled-Ledger Table */}
       <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
         <div className="table-container" style={{ border: 'none' }}>
           <table className="table">
@@ -258,7 +255,7 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
                   </div>
                 </th>
                 <th>Subject & Category</th>
-                {user?.role !== 'student' && <th>Requester</th>}
+                {user?.role !== 'student' && <th>Student Requester</th>}
                 <th onClick={() => toggleSort('priority')} style={{ cursor: 'pointer' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     Priority <ArrowUpDown size={12} />
@@ -269,11 +266,11 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
                     Status <ArrowUpDown size={12} />
                   </div>
                 </th>
-                <th>Assignee</th>
+                <th>Assigned Staff</th>
                 <th>SLA State</th>
                 <th onClick={() => toggleSort('created_at')} style={{ cursor: 'pointer' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                    Created <ArrowUpDown size={12} />
+                    Date Logged <ArrowUpDown size={12} />
                   </div>
                 </th>
                 <th>Action</th>
@@ -282,15 +279,15 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={9} style={{ textAlign: 'center', padding: 40, color: '#64748b' }}>
-                    <Clock size={24} className="animate-spin" style={{ margin: '0 auto 8px' }} />
-                    Loading tickets...
+                  <td colSpan={9} style={{ textAlign: 'center', padding: 40, color: 'var(--ink-soft)' }}>
+                    <Clock size={24} className="animate-spin" style={{ margin: '0 auto 8px', color: 'var(--brass)' }} />
+                    <span className="data-mono">Consulting registry records...</span>
                   </td>
                 </tr>
               ) : tickets.length === 0 ? (
                 <tr>
-                  <td colSpan={9} style={{ textAlign: 'center', padding: 48, color: '#94a3b8' }}>
-                    No tickets match the selected filters or search criteria.
+                  <td colSpan={9} style={{ textAlign: 'center', padding: 48, color: 'var(--ink-soft)' }}>
+                    This queue is empty. No requests match the selected registrar filters or search query.
                   </td>
                 </tr>
               ) : (
@@ -300,21 +297,21 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
                     onClick={() => onSelectTicket(t.id)}
                     style={{
                       cursor: 'pointer',
-                      backgroundColor: t.is_overdue ? '#fffafa' : 'transparent'
+                      borderLeft: t.is_overdue ? '3px solid var(--oxblood)' : undefined
                     }}
                   >
-                    <td style={{ fontWeight: 700, color: '#2563eb', whiteSpace: 'nowrap' }}>
+                    <td className="data-mono" style={{ fontWeight: 600, color: 'var(--forest)', whiteSpace: 'nowrap' }}>
                       {t.ticket_number}
                     </td>
                     <td style={{ maxWidth: 300 }}>
-                      <div style={{ fontWeight: 600, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      <div style={{ fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {t.subject}
                       </div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                      <div className="meta-small" style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
                         <span>{t.category_name}</span>
                         {t.comment_count > 0 && (
-                          <span style={{ background: '#f1f5f9', padding: '1px 6px', borderRadius: 4, fontSize: '0.7rem' }}>
-                            {t.comment_count} replies
+                          <span className="data-mono" style={{ background: 'var(--paper)', padding: '1px 6px', borderRadius: 2, fontSize: '0.675rem' }}>
+                            {t.comment_count} notes
                           </span>
                         )}
                       </div>
@@ -322,8 +319,10 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
 
                     {user?.role !== 'student' && (
                       <td>
-                        <div style={{ fontWeight: 500, color: '#0f172a' }}>{t.requester_name}</div>
-                        <div style={{ fontSize: '0.725rem', color: '#94a3b8' }}>{t.requester_identifier || t.requester_email}</div>
+                        <div style={{ fontWeight: 500, color: 'var(--ink)' }}>{t.requester_name}</div>
+                        <div className="data-mono" style={{ fontSize: '0.725rem', color: 'var(--ink-soft)' }}>
+                          {t.requester_identifier || t.requester_email}
+                        </div>
                       </td>
                     )}
 
@@ -331,13 +330,13 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
                     <td><StatusBadge status={t.status} /></td>
                     <td>
                       {t.assignee_name ? (
-                        <span style={{ fontSize: '0.85rem', color: '#334155', fontWeight: 500 }}>{t.assignee_name}</span>
+                        <span style={{ fontSize: '0.85rem', color: 'var(--ink)', fontWeight: 500 }}>{t.assignee_name}</span>
                       ) : (
-                        <span style={{ fontSize: '0.8rem', color: '#94a3b8', fontStyle: 'italic' }}>Unassigned</span>
+                        <span style={{ fontSize: '0.8rem', color: 'var(--ink-soft)', fontStyle: 'italic' }}>Unassigned</span>
                       )}
                     </td>
                     <td><SlaBadge slaStatus={t.sla_status} /></td>
-                    <td style={{ fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                    <td className="data-mono" style={{ fontSize: '0.775rem', color: 'var(--ink-soft)', whiteSpace: 'nowrap' }}>
                       {new Date(t.created_at).toLocaleDateString()}
                     </td>
                     <td>
@@ -348,7 +347,7 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
                           onSelectTicket(t.id);
                         }}
                       >
-                        Details
+                        Inspect
                       </button>
                     </td>
                   </tr>
@@ -356,41 +355,6 @@ export default function TicketList({ user, onSelectTicket, onNavigate }) {
               )}
             </tbody>
           </table>
-        </div>
-
-        {/* Pagination Controls */}
-        <div style={{
-          padding: '14px 20px',
-          borderTop: '1px solid var(--border-color)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          background: '#ffffff',
-          flexWrap: 'wrap',
-          gap: 12
-        }}>
-          <span style={{ fontSize: '0.825rem', color: '#64748b' }}>
-            Page {pagination.page} of {pagination.totalPages}
-          </span>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button
-              className="btn btn-secondary btn-sm"
-              disabled={pagination.page <= 1 || loading}
-              onClick={() => fetchTickets(pagination.page - 1)}
-            >
-              <ChevronLeft size={16} />
-              Previous
-            </button>
-            <button
-              className="btn btn-secondary btn-sm"
-              disabled={pagination.page >= pagination.totalPages || loading}
-              onClick={() => fetchTickets(pagination.page + 1)}
-            >
-              Next
-              <ChevronRight size={16} />
-            </button>
-          </div>
         </div>
       </div>
     </div>

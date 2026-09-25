@@ -12,7 +12,7 @@ export default function ResolveModal({ ticket, isOpen, onClose, onResolved }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!summary.trim() || summary.trim().length < 5) {
-      setError('Please provide a meaningful resolution summary of at least 5 characters.');
+      setError('Please provide an official resolution summary of at least 5 characters.');
       return;
     }
 
@@ -35,24 +35,27 @@ export default function ResolveModal({ ticket, isOpen, onClose, onResolved }) {
         <div className="modal-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
-              width: 34,
-              height: 34,
-              borderRadius: 8,
-              backgroundColor: '#ecfdf5',
-              color: '#059669',
+              width: 32,
+              height: 32,
+              borderRadius: 4,
+              backgroundColor: 'var(--paper)',
+              color: 'var(--sage)',
+              border: '1px solid var(--hairline)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <CheckCircle2 size={18} />
+              <CheckCircle2 size={17} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.05rem', fontWeight: 700, margin: 0 }}>Resolve Ticket</h3>
-              <p style={{ fontSize: '0.8rem', color: '#64748b', margin: 0 }}>{ticket.ticket_number}</p>
+              <h2 className="modal-title" style={{ fontSize: '1.15rem' }}>Resolve Ticket Record</h2>
+              <p className="data-mono" style={{ fontSize: '0.75rem', color: 'var(--ink-soft)', margin: 0 }}>
+                {ticket.ticket_number}
+              </p>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
-            <X size={20} />
+          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--ink-soft)' }}>
+            <X size={18} />
           </button>
         </div>
 
@@ -60,13 +63,13 @@ export default function ResolveModal({ ticket, isOpen, onClose, onResolved }) {
           <div className="modal-body">
             {error && <div className="alert alert-danger">{error}</div>}
 
-            <p style={{ fontSize: '0.875rem', color: '#475569', marginBottom: 16 }}>
-              Provide a clear description of the actions taken to solve the student's request. This summary will be permanently saved to the ticket history.
+            <p style={{ fontSize: '0.85rem', color: 'var(--ink-soft)', marginBottom: 16 }}>
+              Provide a clear description of the administrative actions taken to solve the student's request. This official summary will be permanently archived in the registrar ledger.
             </p>
 
             <div className="form-group">
               <label className="form-label">
-                Resolution Summary <span style={{ color: '#ef4444' }}>*</span>
+                Official Resolution Statement <span style={{ color: 'var(--oxblood)' }}>*</span>
               </label>
               <textarea
                 className="form-control"
@@ -76,8 +79,8 @@ export default function ResolveModal({ ticket, isOpen, onClose, onResolved }) {
                 onChange={(e) => setSummary(e.target.value)}
                 required
               />
-              <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 4, display: 'block' }}>
-                Minimum 5 characters required.
+              <span className="meta-small" style={{ fontSize: '0.7rem', marginTop: 4, display: 'block' }}>
+                Minimum 5 characters required for administrative archival.
               </span>
             </div>
           </div>
@@ -87,7 +90,7 @@ export default function ResolveModal({ ticket, isOpen, onClose, onResolved }) {
               Cancel
             </button>
             <button type="submit" className="btn btn-success" disabled={submitting || summary.trim().length < 5}>
-              {submitting ? 'Resolving...' : 'Complete & Resolve'}
+              {submitting ? 'Resolving...' : 'Confirm Resolution'}
             </button>
           </div>
         </form>

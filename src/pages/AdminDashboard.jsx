@@ -8,14 +8,13 @@ import {
   Users,
   ShieldAlert,
   ArrowRight,
-  Filter,
   Calendar,
 } from 'lucide-react';
 import { api } from '../api';
 import { StatusDonutChart, CategoryBarChart, AgeingDistributionChart, StaffWorkloadChart } from '../components/Charts';
 import StatusBadge from '../components/StatusBadge';
 import PriorityBadge from '../components/PriorityBadge';
-import SlaBadge from '../components/SlaBadge';
+import SplitFlapCounter from '../components/SplitFlapCounter';
 
 export default function AdminDashboard({ onSelectTicket, onNavigate }) {
   const [data, setData] = useState(null);
@@ -41,14 +40,15 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
 
   if (loading && !data) {
     return (
-      <div style={{ padding: '60px 0', textAlign: 'center', color: '#64748b' }}>
-        <Clock size={32} className="animate-spin" style={{ margin: '0 auto 12px' }} />
-        <p>Loading real-time operational dashboard...</p>
+      <div style={{ padding: '60px 0', textAlign: 'center', color: 'var(--ink-soft)' }}>
+        <Clock size={32} className="animate-spin" style={{ margin: '0 auto 12px', color: 'var(--brass)' }} />
+        <p className="data-mono">Consulting registrar archives...</p>
       </div>
     );
   }
 
   const { kpis, status_breakdown, category_breakdown, staff_workload, ageing_bins, overdue_tickets, recent_activity } = data || {};
+  const activeCount = (kpis?.open || 0) + (kpis?.in_progress || 0);
 
   return (
     <div>
@@ -63,28 +63,36 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
 
         {/* Date Filter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#ffffff', border: '1px solid #e2e8f0', padding: '4px 10px', borderRadius: 8 }}>
-            <Calendar size={14} color="#64748b" />
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'var(--paper-raised)',
+            border: '1px solid var(--hairline)',
+            padding: '5px 12px',
+            borderRadius: 'var(--radius-input)'
+          }}>
+            <Calendar size={14} color="var(--ink-soft)" />
             <input
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
-              style={{ border: 'none', background: 'transparent', fontSize: '0.825rem', color: '#334155', outline: 'none' }}
+              style={{ border: 'none', background: 'transparent', fontSize: '0.825rem', color: 'var(--ink)', outline: 'none' }}
               title="Filter from date"
             />
-            <span style={{ color: '#94a3b8' }}>to</span>
+            <span style={{ color: 'var(--ink-soft)' }}>to</span>
             <input
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
-              style={{ border: 'none', background: 'transparent', fontSize: '0.825rem', color: '#334155', outline: 'none' }}
+              style={{ border: 'none', background: 'transparent', fontSize: '0.825rem', color: 'var(--ink)', outline: 'none' }}
               title="Filter to date"
             />
           </div>
           {(dateFrom || dateTo) && (
             <button
               onClick={() => { setDateFrom(''); setDateTo(''); }}
-              style={{ background: '#f1f5f9', border: 'none', padding: '6px 12px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer', color: '#475569' }}
+              className="btn btn-secondary btn-sm"
             >
               Reset
             </button>
@@ -92,51 +100,51 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
         </div>
       </div>
 
-      {/* Primary KPI Grid (FR-041) */}
+      {/* Primary KPI Strip — Split-Flap / Solari departure board display */}
       <div className="kpi-grid">
-        {/* Total Tickets */}
+        {/* Total Inquiries */}
         <div className="kpi-card">
           <div className="kpi-card-header">
             <span className="kpi-title">Total Inquiries</span>
-            <div className="kpi-icon-box" style={{ background: '#eff6ff', color: '#2563eb' }}>
-              <Ticket size={20} />
+            <div className="kpi-icon-box">
+              <Ticket size={17} />
             </div>
           </div>
-          <div className="kpi-value">{kpis?.total || 0}</div>
-          <div className="kpi-subtitle">All-time student tickets</div>
+          <SplitFlapCounter value={kpis?.total ?? 0} />
+          <div className="kpi-subtitle">All-time student tickets logged</div>
         </div>
 
-        {/* Active In-Progress & Open */}
+        {/* Active Open / In-Progress */}
         <div className="kpi-card">
           <div className="kpi-card-header">
             <span className="kpi-title">Open & Active</span>
-            <div className="kpi-icon-box" style={{ background: '#eef2ff', color: '#4f46e5' }}>
-              <Clock size={20} />
+            <div className="kpi-icon-box">
+              <Clock size={17} />
             </div>
           </div>
-          <div className="kpi-value" style={{ color: '#4f46e5' }}>
-            {(kpis?.open || 0) + (kpis?.in_progress || 0)}
-          </div>
+          <SplitFlapCounter value={activeCount} />
           <div className="kpi-subtitle">
-            {kpis?.open || 0} pending triage • {kpis?.in_progress || 0} in progress
+            {kpis?.open || 0} pending triage • {kpis?.in_progress || 0} under review
           </div>
         </div>
 
         {/* Overdue / SLA Breaches */}
-        <div className="kpi-card" style={{ borderColor: (kpis?.overdue || 0) > 0 ? '#fca5a5' : '#e2e8f0' }}>
+        <div className="kpi-card" style={{
+          borderLeft: (kpis?.overdue || 0) > 0 ? '3px solid var(--oxblood)' : '1px solid var(--hairline)'
+        }}>
           <div className="kpi-card-header">
-            <span className="kpi-title" style={{ color: (kpis?.overdue || 0) > 0 ? '#b91c1c' : '#64748b' }}>
+            <span className="kpi-title" style={{ color: (kpis?.overdue || 0) > 0 ? 'var(--oxblood)' : 'var(--ink-soft)' }}>
               Overdue Tickets
             </span>
-            <div className="kpi-icon-box" style={{ background: '#fee2e2', color: '#dc2626' }}>
-              <AlertTriangle size={20} />
+            <div className="kpi-icon-box" style={{
+              color: (kpis?.overdue || 0) > 0 ? 'var(--oxblood)' : 'var(--ink-soft)'
+            }}>
+              <AlertTriangle size={17} />
             </div>
           </div>
-          <div className="kpi-value" style={{ color: '#dc2626' }}>
-            {kpis?.overdue || 0}
-          </div>
-          <div className="kpi-subtitle">
-            {(kpis?.approaching || 0)} tickets approaching deadline
+          <SplitFlapCounter value={kpis?.overdue ?? 0} />
+          <div className="kpi-subtitle" style={{ color: (kpis?.overdue || 0) > 0 ? 'var(--oxblood)' : 'var(--ink-soft)' }}>
+            {(kpis?.approaching || 0)} approaching SLA deadline
           </div>
         </div>
 
@@ -144,28 +152,24 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
         <div className="kpi-card">
           <div className="kpi-card-header">
             <span className="kpi-title">SLA Compliance</span>
-            <div className="kpi-icon-box" style={{ background: '#ecfdf5', color: '#059669' }}>
-              <ShieldAlert size={20} />
+            <div className="kpi-icon-box">
+              <CheckCircle size={17} />
             </div>
           </div>
-          <div className="kpi-value" style={{ color: '#059669' }}>
-            {kpis?.sla_compliance_rate || 0}%
-          </div>
-          <div className="kpi-subtitle">Target: 95% compliance</div>
+          <SplitFlapCounter value={kpis?.sla_compliance_rate ?? 0} suffix="%" />
+          <div className="kpi-subtitle">Institutional standard: 95%</div>
         </div>
 
         {/* Avg Resolution Time */}
         <div className="kpi-card">
           <div className="kpi-card-header">
             <span className="kpi-title">Avg Resolution</span>
-            <div className="kpi-icon-box" style={{ background: '#f0fdf4', color: '#16a34a' }}>
-              <TrendingUp size={20} />
+            <div className="kpi-icon-box">
+              <TrendingUp size={17} />
             </div>
           </div>
-          <div className="kpi-value">
-            {kpis?.avg_resolution_hours || 0}<span style={{ fontSize: '1.1rem', fontWeight: 600 }}>h</span>
-          </div>
-          <div className="kpi-subtitle">Across resolved requests</div>
+          <SplitFlapCounter value={kpis?.avg_resolution_hours ?? 0} suffix="h" />
+          <div className="kpi-subtitle">Across completed inquiries</div>
         </div>
       </div>
 
@@ -174,8 +178,8 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
         {/* Status Distribution */}
         <div className="card">
           <div className="card-header">
-            <h3 className="card-title">Ticket Lifecycle Distribution</h3>
-            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Live counts</span>
+            <h2 className="card-title">Ticket Lifecycle Distribution</h2>
+            <span className="meta-small">Live counts</span>
           </div>
           <StatusDonutChart statusData={status_breakdown} />
         </div>
@@ -183,8 +187,8 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
         {/* Category Breakdown */}
         <div className="card">
           <div className="card-header">
-            <h3 className="card-title">Volume by Department / Category</h3>
-            <span style={{ fontSize: '0.8rem', color: '#64748b' }}>All requests</span>
+            <h2 className="card-title">Volume by Department / Category</h2>
+            <span className="meta-small">All inquiries</span>
           </div>
           <CategoryBarChart categoryData={category_breakdown} />
         </div>
@@ -194,12 +198,12 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
       <div className="card" style={{ marginBottom: 28 }}>
         <div className="card-header">
           <div>
-            <h3 className="card-title">Ticket Ageing Analysis</h3>
-            <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: 2 }}>
+            <h2 className="card-title">Ticket Ageing Analysis</h2>
+            <p className="meta-small" style={{ marginTop: 2 }}>
               Classification of pending & active requests by elapsed response time
             </p>
           </div>
-          <span className="badge badge-priority-medium">Active Requests</span>
+          <span className="stamp-badge stamp-medium">ACTIVE QUEUE</span>
         </div>
         <AgeingDistributionChart ageingBins={ageing_bins} />
       </div>
@@ -210,8 +214,8 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
         <div className="card">
           <div className="card-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Users size={18} color="#2563eb" />
-              <h3 className="card-title">Staff Workload Distribution</h3>
+              <Users size={18} color="var(--forest)" />
+              <h2 className="card-title">Staff Caseload Distribution</h2>
             </div>
             <button
               onClick={() => onNavigate('staff')}
@@ -227,53 +231,57 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
         <div className="card">
           <div className="card-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <ShieldAlert size={18} color="#dc2626" />
-              <h3 className="card-title">Action Required: Overdue Tickets</h3>
+              <ShieldAlert size={18} color="var(--oxblood)" />
+              <h2 className="card-title">Action Required: Overdue Tickets</h2>
             </div>
             <button
               onClick={() => onNavigate('tickets')}
               className="btn btn-secondary btn-sm"
             >
-              View All
+              View Registry
             </button>
           </div>
 
           {(!overdue_tickets || overdue_tickets.length === 0) ? (
-            <div style={{ padding: '30px 20px', textAlign: 'center', color: '#059669', fontSize: '0.875rem' }}>
-              <CheckCircle size={24} style={{ margin: '0 auto 8px', color: '#10b981' }} />
-              Great news! No tickets are currently overdue.
+            <div style={{ padding: '36px 20px', textAlign: 'center', color: 'var(--sage)', fontSize: '0.9rem' }}>
+              <CheckCircle size={24} style={{ margin: '0 auto 8px', color: 'var(--sage)' }} />
+              All tickets are currently compliant within their SLA resolution deadlines.
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {overdue_tickets.map(t => (
                 <div
                   key={t.id}
                   onClick={() => onSelectTicket(t.id)}
                   style={{
-                    padding: '12px 14px',
-                    border: '1px solid #fecaca',
-                    borderRadius: 10,
-                    background: '#fff5f5',
+                    padding: '14px 16px',
+                    border: '1px solid var(--hairline)',
+                    borderLeft: '4px solid var(--oxblood)',
+                    borderRadius: 'var(--radius-card)',
+                    background: 'var(--paper-raised)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
-                    transition: 'transform 0.15s ease'
+                    boxShadow: 'var(--shadow-offset-sm)',
+                    position: 'relative'
                   }}
                 >
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                      <span style={{ fontWeight: 700, fontSize: '0.825rem', color: '#991b1b' }}>{t.ticket_number}</span>
+                      <span className="data-mono" style={{ fontWeight: 600, color: 'var(--oxblood)' }}>
+                        {t.ticket_number}
+                      </span>
                       <PriorityBadge priority={t.priority} />
                     </div>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 600, color: '#0f172a' }}>
+                    <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--ink)' }}>
                       {t.subject}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 2 }}>
-                      Assigned to: {t.assignee_name || 'Unassigned'} • Dept: {t.department_name || 'General'}
+                    <div className="meta-small" style={{ marginTop: 2 }}>
+                      Assigned: {t.assignee_name || 'Unassigned'} • Dept: {t.department_name || 'General Records'}
                     </div>
                   </div>
-                  <ArrowRight size={16} color="#dc2626" />
+                  <ArrowRight size={16} color="var(--oxblood)" />
                 </div>
               ))}
             </div>
@@ -284,19 +292,19 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
       {/* Recent Institutional Activity Feed */}
       <div className="card">
         <div className="card-header">
-          <h3 className="card-title">Recent System Audit Activity</h3>
-          <span style={{ fontSize: '0.8rem', color: '#64748b' }}>Latest 8 events</span>
+          <h2 className="card-title">Recent System Audit Activity</h2>
+          <span className="meta-small">Latest 8 ledger entries</span>
         </div>
         <div className="timeline">
           {recent_activity?.map(act => (
             <div key={act.id} className="timeline-item">
               <div className="timeline-dot" />
               <div className="timeline-content">
-                <span style={{ fontWeight: 600, color: '#0f172a' }}>
-                  {act.actor_name || 'System'}:
+                <span style={{ fontWeight: 600, color: 'var(--ink)' }}>
+                  {act.actor_name || 'Registrar System'}:
                 </span>{' '}
-                <span style={{ color: '#475569' }}>{act.description}</span>
-                <span style={{ color: '#2563eb', fontWeight: 600, marginLeft: 8 }}>
+                <span style={{ color: 'var(--ink)' }}>{act.description}</span>
+                <span className="data-mono" style={{ color: 'var(--forest)', fontWeight: 600, marginLeft: 8 }}>
                   ({act.ticket_number})
                 </span>
                 <div className="timeline-time">

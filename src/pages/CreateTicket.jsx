@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PlusCircle, ArrowLeft, Send, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { api } from '../api';
 
 export default function CreateTicket({ onTicketCreated, onCancel }) {
@@ -11,7 +11,6 @@ export default function CreateTicket({ onTicketCreated, onCancel }) {
   const [attachmentUrl, setAttachmentUrl] = useState('');
 
   const [loading, setLoading] = useState(false);
-  const [loadingCats, setLoadingCats] = useState(true);
   const [error, setError] = useState('');
   const [successTicket, setSuccessTicket] = useState(null);
 
@@ -24,8 +23,7 @@ export default function CreateTicket({ onTicketCreated, onCancel }) {
           setCategoryId(String(activeCats[0].id));
         }
       })
-      .catch(err => setError('Failed to load categories: ' + err.message))
-      .finally(() => setLoadingCats(false));
+      .catch(err => setError('Failed to load categories: ' + err.message));
   }, []);
 
   const handleSubmit = async (e) => {
@@ -33,7 +31,7 @@ export default function CreateTicket({ onTicketCreated, onCancel }) {
     setError('');
 
     if (!categoryId) {
-      setError('Please select a support category');
+      setError('Please select an administrative category from the registry');
       return;
     }
 
@@ -59,7 +57,7 @@ export default function CreateTicket({ onTicketCreated, onCancel }) {
 
       setSuccessTicket(res.ticket);
     } catch (err) {
-      setError(err.message || 'Failed to submit ticket');
+      setError(err.message || 'Failed to submit ticket to registry');
       setLoading(false);
     }
   };
@@ -68,43 +66,45 @@ export default function CreateTicket({ onTicketCreated, onCancel }) {
     return (
       <div className="card" style={{ maxWidth: 540, margin: '40px auto', textAlign: 'center', padding: 36 }}>
         <div style={{
-          width: 56,
-          height: 56,
+          width: 52,
+          height: 52,
           borderRadius: '50%',
-          backgroundColor: '#ecfdf5',
-          color: '#059669',
+          border: '2px solid var(--sage)',
+          backgroundColor: 'rgba(92, 122, 82, 0.12)',
+          color: 'var(--sage)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           margin: '0 auto 16px'
         }}>
-          <CheckCircle2 size={32} />
+          <CheckCircle2 size={28} />
         </div>
-        <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>
-          Ticket Successfully Raised!
-        </h2>
-        <div style={{
+        <h1 style={{ fontSize: '1.4rem', fontWeight: 500, color: 'var(--ink)', marginBottom: 8 }}>
+          Ticket Successfully Logged in Registry
+        </h1>
+        <div className="data-mono" style={{
           fontSize: '1.1rem',
-          fontWeight: 700,
-          color: '#2563eb',
-          background: '#eff6ff',
-          padding: '8px 16px',
-          borderRadius: 8,
+          fontWeight: 600,
+          color: 'var(--forest)',
+          background: 'var(--paper)',
+          padding: '8px 18px',
+          border: '1px solid var(--hairline)',
+          borderRadius: 2,
           display: 'inline-block',
           marginBottom: 16
         }}>
           {successTicket.ticket_number}
         </div>
-        <p style={{ color: '#475569', fontSize: '0.9rem', lineHeight: 1.5, marginBottom: 24 }}>
-          Your request has been routed to the respective college administrative staff. You will receive in-app notifications as updates occur.
+        <p style={{ color: 'var(--ink-soft)', fontSize: '0.9rem', lineHeight: 1.55, marginBottom: 24 }}>
+          Your request has been officially cataloged and dispatched to the designated department queue with an active SLA tracking schedule.
         </p>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
           <button className="btn btn-secondary" onClick={() => onTicketCreated(null)}>
-            View All Tickets
+            View Ticket Registry
           </button>
           <button className="btn btn-primary" onClick={() => onTicketCreated(successTicket.id)}>
-            Open This Ticket
+            Inspect Case File
           </button>
         </div>
       </div>
@@ -115,13 +115,13 @@ export default function CreateTicket({ onTicketCreated, onCancel }) {
     <div style={{ maxWidth: 740, margin: '0 auto' }}>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Submit a Support Request</h1>
+          <h1 className="page-title">Submit Support Request</h1>
           <p className="page-subtitle">
-            Provide the details of your inquiry or issue. Relevant department staff will be automatically notified.
+            Provide details of your inquiry. Relevant institutional department staff will be officially notified.
           </p>
         </div>
         <button className="btn btn-secondary btn-sm" onClick={onCancel}>
-          <ArrowLeft size={16} /> Cancel
+          <ArrowLeft size={15} /> Cancel
         </button>
       </div>
 
@@ -132,13 +132,12 @@ export default function CreateTicket({ onTicketCreated, onCancel }) {
           {/* Category Selection */}
           <div className="form-group">
             <label className="form-label">
-              Inquiry Category <span style={{ color: '#ef4444' }}>*</span>
+              Inquiry Department Category <span style={{ color: 'var(--oxblood)' }}>*</span>
             </label>
             <select
               className="form-control"
               value={categoryId}
               onChange={(e) => setCategoryId(e.target.value)}
-              disabled={loadingCats}
               required
             >
               {categories.map(c => (
@@ -147,112 +146,103 @@ export default function CreateTicket({ onTicketCreated, onCancel }) {
                 </option>
               ))}
             </select>
-            <span style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 4, display: 'block' }}>
-              Choosing the accurate category routes your ticket to the correct staff team immediately.
-            </span>
+            <div className="meta-small" style={{ marginTop: 4 }}>
+              Routes directly to the appropriate records office staff desk
+            </div>
           </div>
 
-          {/* Priority */}
+          {/* Priority Selection */}
           <div className="form-group">
-            <label className="form-label">Priority Level</label>
+            <label className="form-label">Urgency Level</label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
               {[
-                { id: 'low', label: 'Low', desc: 'General queries (72h target)' },
-                { id: 'medium', label: 'Medium', desc: 'Standard requests (48h target)' },
-                { id: 'high', label: 'High', desc: 'Exam/Loan deadlines (24h target)' },
-                { id: 'urgent', label: 'Urgent', desc: 'Exam lockout/Emergency (4h target)' },
+                { id: 'low', label: 'Low', desc: 'Standard query' },
+                { id: 'medium', label: 'Medium', desc: 'Routine inquiry' },
+                { id: 'high', label: 'High', desc: 'Time-sensitive' },
+                { id: 'urgent', label: 'Urgent', desc: 'Immediate academic blocker' }
               ].map(p => (
-                <label
+                <button
+                  type="button"
                   key={p.id}
+                  onClick={() => setPriority(p.id)}
                   style={{
-                    border: `1px solid ${priority === p.id ? '#2563eb' : '#e2e8f0'}`,
-                    background: priority === p.id ? '#eff6ff' : '#ffffff',
-                    borderRadius: 10,
-                    padding: '10px 12px',
+                    padding: '10px 8px',
+                    borderRadius: 2,
+                    textAlign: 'center',
                     cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    transition: 'all 0.15s ease'
+                    background: priority === p.id ? 'var(--paper)' : 'var(--paper-raised)',
+                    border: priority === p.id ? '2px solid var(--brass)' : '1px solid var(--hairline)',
+                    boxShadow: priority === p.id ? 'var(--shadow-offset-sm)' : 'none',
+                    transition: 'all 0.1s ease'
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                    <input
-                      type="radio"
-                      name="priority"
-                      value={p.id}
-                      checked={priority === p.id}
-                      onChange={() => setPriority(p.id)}
-                    />
-                    <strong style={{ fontSize: '0.85rem', color: priority === p.id ? '#1e40af' : '#0f172a', textTransform: 'capitalize' }}>
-                      {p.label}
-                    </strong>
+                  <div style={{
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    textTransform: 'uppercase',
+                    color: priority === p.id ? 'var(--brass)' : 'var(--ink)'
+                  }}>
+                    {p.label}
                   </div>
-                  <span style={{ fontSize: '0.7rem', color: '#64748b' }}>{p.desc}</span>
-                </label>
+                  <div style={{ fontSize: '0.7rem', color: 'var(--ink-soft)', marginTop: 2 }}>
+                    {p.desc}
+                  </div>
+                </button>
               ))}
             </div>
           </div>
 
-          {/* Subject */}
+          {/* Subject Field */}
           <div className="form-group">
             <label className="form-label">
-              Subject Summary <span style={{ color: '#ef4444' }}>*</span>
+              Request Subject <span style={{ color: 'var(--oxblood)' }}>*</span>
             </label>
             <input
               type="text"
               className="form-control"
-              placeholder="e.g., Payment deducted twice for semester 4 tuition fee"
+              placeholder="e.g. Fee Receipt Verification for Semester 4"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              minLength={5}
-              maxLength={150}
               required
             />
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 4, display: 'block' }}>
-              Keep it concise and descriptive ({subject.length}/150 chars).
-            </span>
           </div>
 
-          {/* Description */}
+          {/* Detailed Description */}
           <div className="form-group">
             <label className="form-label">
-              Detailed Description <span style={{ color: '#ef4444' }}>*</span>
+              Detailed Statement of Inquiry <span style={{ color: 'var(--oxblood)' }}>*</span>
             </label>
             <textarea
               className="form-control"
-              rows={6}
-              placeholder="Provide all relevant details such as transaction IDs, subject course codes, date of events, or error messages encountered..."
+              rows={5}
+              placeholder="Detail your request, mentioning specific course codes, dates, reference numbers, or prior communications..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              minLength={10}
               required
             />
-            <span style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 4, display: 'block' }}>
-              Minimum 10 characters ({description.length} entered).
-            </span>
           </div>
 
-          {/* Optional Attachment Reference */}
+          {/* Optional Attachment URL */}
           <div className="form-group">
-            <label className="form-label">Reference Link / Document URL (Optional)</label>
+            <label className="form-label">Supporting Document URL (Optional)</label>
             <input
-              type="text"
+              type="url"
               className="form-control"
-              placeholder="e.g. https://drive.google.com/file/d/your-receipt-receipt.pdf"
+              placeholder="https://drive.institution.edu/file/your-receipt.pdf"
               value={attachmentUrl}
               onChange={(e) => setAttachmentUrl(e.target.value)}
             />
+            <div className="meta-small" style={{ marginTop: 4 }}>
+              Provide a link to fee slips, medical certificates, or scanned forms
+            </div>
           </div>
 
-          {/* Action buttons */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 24, paddingTop: 16, borderTop: '1px solid #f1f5f9' }}>
-            <button type="button" className="btn btn-secondary" onClick={onCancel} disabled={loading}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, marginTop: 24 }}>
+            <button type="button" className="btn btn-secondary" onClick={onCancel}>
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={loading || !subject.trim() || !description.trim()}>
-              <Send size={16} />
-              {loading ? 'Submitting...' : 'Submit Support Ticket'}
+            <button type="submit" className="btn btn-primary" disabled={loading}>
+              {loading ? 'Submitting to Registry...' : 'Lodge Support Request'}
             </button>
           </div>
         </form>

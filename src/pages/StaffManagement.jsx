@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, UserPlus, Check, X, Shield, Mail, Briefcase, Clock, Plus } from 'lucide-react';
+import { UserPlus, Clock, X } from 'lucide-react';
 import { api } from '../api';
 
 export default function StaffManagement() {
@@ -80,15 +80,15 @@ export default function StaffManagement() {
     <div>
       <div className="page-header">
         <div>
-          <h1 className="page-title">Support Staff Management</h1>
+          <h1 className="page-title">Support Staff Directory</h1>
           <p className="page-subtitle">
-            Manage administrative staff accounts, department assignments, active workloads, and ticket assignment eligibility.
+            Manage administrative staff records, department assignments, active caseloads, and desk eligibility.
           </p>
         </div>
 
         <button className="btn btn-primary" onClick={() => setIsAddOpen(true)}>
           <UserPlus size={16} />
-          Add Staff Member
+          Register Staff Member
         </button>
       </div>
 
@@ -99,11 +99,11 @@ export default function StaffManagement() {
           <table className="table">
             <thead>
               <tr>
-                <th>Staff Member</th>
+                <th>Staff Officer</th>
                 <th>Employee ID</th>
                 <th>Department</th>
-                <th>Active Workload</th>
-                <th>Total Resolved</th>
+                <th>Active Caseload</th>
+                <th>Resolved Total</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>
@@ -111,15 +111,15 @@ export default function StaffManagement() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: 40, color: '#64748b' }}>
-                    <Clock size={24} className="animate-spin" style={{ margin: '0 auto 8px' }} />
-                    Loading staff directory...
+                  <td colSpan={7} style={{ textAlign: 'center', padding: 40, color: 'var(--ink-soft)' }}>
+                    <Clock size={24} className="animate-spin" style={{ margin: '0 auto 8px', color: 'var(--brass)' }} />
+                    <span className="data-mono">Consulting personnel register...</span>
                   </td>
                 </tr>
               ) : staffList.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: 40, color: '#94a3b8' }}>
-                    No staff accounts configured.
+                  <td colSpan={7} style={{ textAlign: 'center', padding: 40, color: 'var(--ink-soft)' }}>
+                    No staff records currently registered in the ledger. Use "Register Staff Member" above to create a profile.
                   </td>
                 </tr>
               ) : (
@@ -127,58 +127,45 @@ export default function StaffManagement() {
                   <tr key={s.id}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                        <div className="avatar" style={{ width: 32, height: 32, fontSize: '0.8rem' }}>
+                        <div className="avatar avatar-staff" style={{ width: 32, height: 32, fontSize: '0.75rem' }}>
                           {s.full_name.charAt(0)}
                         </div>
                         <div>
-                          <div style={{ fontWeight: 600, color: '#0f172a' }}>{s.full_name}</div>
-                          <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{s.email}</div>
+                          <div style={{ fontWeight: 600, color: 'var(--ink)' }}>{s.full_name}</div>
+                          <div className="data-mono" style={{ fontSize: '0.725rem', color: 'var(--ink-soft)' }}>{s.email}</div>
                         </div>
                       </div>
                     </td>
-                    <td style={{ fontWeight: 600, color: '#475569' }}>
+                    <td className="data-mono" style={{ fontWeight: 600, color: 'var(--ink)' }}>
                       {s.student_or_employee_id || 'STF-' + s.id}
                     </td>
                     <td>
-                      <span style={{
-                        background: '#f1f5f9',
-                        padding: '4px 10px',
-                        borderRadius: 6,
-                        fontSize: '0.8rem',
-                        fontWeight: 500,
-                        color: '#334155'
-                      }}>
-                        {s.department_name || 'General / Unassigned'}
+                      <span style={{ fontWeight: 500 }}>{s.department_name || 'General Records'}</span>
+                    </td>
+                    <td>
+                      <span className="data-mono" style={{ fontWeight: 600, color: (s.active_tickets || 0) > 4 ? 'var(--oxblood)' : 'var(--forest)' }}>
+                        {s.active_tickets || 0} active
                       </span>
                     </td>
                     <td>
-                      <span style={{
-                        fontWeight: 700,
-                        color: s.active_workload > 4 ? '#dc2626' : '#2563eb'
-                      }}>
-                        {s.active_workload || 0} active
+                      <span className="data-mono" style={{ fontWeight: 600, color: 'var(--sage)' }}>
+                        {s.resolved_count || 0}
                       </span>
-                    </td>
-                    <td style={{ fontWeight: 600, color: '#059669' }}>
-                      {s.resolved_count || 0} resolved
                     </td>
                     <td>
                       {s.is_active ? (
-                        <span className="badge badge-status-resolved">
-                          <Check size={12} /> Active
-                        </span>
+                        <span className="badge-status badge-status-resolved">Active Duty</span>
                       ) : (
-                        <span className="badge badge-status-closed">
-                          <X size={12} /> Inactive
-                        </span>
+                        <span className="badge-status badge-status-closed">Deactivated</span>
                       )}
                     </td>
                     <td>
                       <button
-                        className={`btn btn-sm ${s.is_active ? 'btn-secondary' : 'btn-primary'}`}
+                        className={`btn btn-sm ${s.is_active ? 'btn-danger' : 'btn-secondary'}`}
                         onClick={() => handleToggleActive(s)}
+                        title={s.is_active ? 'Suspend staff desk access' : 'Reinstate staff desk access'}
                       >
-                        {s.is_active ? 'Deactivate' : 'Activate'}
+                        {s.is_active ? 'Deactivate' : 'Reactivate'}
                       </button>
                     </td>
                   </tr>
@@ -194,12 +181,12 @@ export default function StaffManagement() {
         <div className="modal-backdrop">
           <div className="modal-content">
             <div className="modal-header">
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <UserPlus size={20} color="#2563eb" />
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>Add Support Staff Account</h3>
-              </div>
-              <button onClick={() => setIsAddOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8' }}>
-                <X size={20} />
+              <h2 className="modal-title">Register Staff Member</h2>
+              <button
+                onClick={() => setIsAddOpen(false)}
+                style={{ background: 'none', border: 'none', color: 'var(--ink-soft)', cursor: 'pointer' }}
+              >
+                <X size={18} />
               </button>
             </div>
 
@@ -208,25 +195,13 @@ export default function StaffManagement() {
                 {formError && <div className="alert alert-danger">{formError}</div>}
 
                 <div className="form-group">
-                  <label className="form-label">Full Name <span style={{ color: '#ef4444' }}>*</span></label>
+                  <label className="form-label">Full Legal Name</label>
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="e.g. Dr. Rajesh Khanna"
+                    placeholder="e.g. Eleanor Vance"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Institutional Email <span style={{ color: '#ef4444' }}>*</span></label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    placeholder="rajesh.khanna@campuscare.edu"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -236,20 +211,32 @@ export default function StaffManagement() {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="e.g. STF-201"
+                    placeholder="e.g. EMP-2024-04"
                     value={employeeId}
                     onChange={(e) => setEmployeeId(e.target.value)}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Department Assignment</label>
+                  <label className="form-label">Institutional Email</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder="eleanor.vance@campuscare.edu"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Primary Department</label>
                   <select
                     className="form-control"
                     value={departmentId}
                     onChange={(e) => setDepartmentId(e.target.value)}
+                    required
                   >
-                    <option value="">-- General / Multi-Department --</option>
                     {departments.map(d => (
                       <option key={d.id} value={d.id}>{d.name}</option>
                     ))}
@@ -259,7 +246,7 @@ export default function StaffManagement() {
                 <div className="form-group">
                   <label className="form-label">Initial Password</label>
                   <input
-                    type="text"
+                    type="password"
                     className="form-control"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -269,11 +256,19 @@ export default function StaffManagement() {
               </div>
 
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setIsAddOpen(false)} disabled={submitting}>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setIsAddOpen(false)}
+                >
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary" disabled={submitting || !fullName.trim() || !email.trim()}>
-                  {submitting ? 'Creating...' : 'Create Account'}
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={submitting}
+                >
+                  {submitting ? 'Registering...' : 'Confirm Entry'}
                 </button>
               </div>
             </form>
