@@ -198,7 +198,7 @@ export default function Settings() {
 
       {/* Tab 2: Inquiry Categories */}
       {activeTab === 'categories' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.8fr) minmax(280px, 1fr)', gap: 24 }}>
+        <div className="settings-two-col-grid">
           {/* Categories Table */}
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
             <div className="card-header" style={{ padding: '18px 24px', margin: 0 }}>
@@ -289,7 +289,7 @@ export default function Settings() {
 
       {/* Tab 3: Departments */}
       {activeTab === 'departments' && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.8fr) minmax(280px, 1fr)', gap: 24 }}>
+        <div className="settings-two-col-grid">
           {/* Departments Table */}
           <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
             <div className="card-header" style={{ padding: '18px 24px', margin: 0 }}>

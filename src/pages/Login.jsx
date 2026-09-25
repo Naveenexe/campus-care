@@ -98,7 +98,7 @@ export default function Login({ onLoginSuccess }) {
       position: 'relative'
     }}>
       {/* Centered Registrar's Ledger Card (solid --forest cover) */}
-      <div style={{
+      <div className="login-card" style={{
         width: '100%',
         maxWidth: 520,
         backgroundColor: 'var(--forest)',
@@ -112,7 +112,7 @@ export default function Login({ onLoginSuccess }) {
         overflow: 'hidden'
       }}>
         {/* Ledger Header / Letterhead */}
-        <div style={{
+        <div className="login-card-header" style={{
           padding: '40px 36px 20px',
           textAlign: 'center',
           borderBottom: '1px solid rgba(201, 194, 172, 0.25)',
@@ -146,7 +146,7 @@ export default function Login({ onLoginSuccess }) {
           </div>
 
           {/* Fraunces Wordmark */}
-          <h1 style={{
+          <h1 className="login-title" style={{
             fontFamily: 'var(--font-display)',
             fontSize: '2.2rem',
             fontWeight: 500,
@@ -171,7 +171,7 @@ export default function Login({ onLoginSuccess }) {
         </div>
 
         {/* Form Body */}
-        <div style={{ padding: '28px 36px 36px' }}>
+        <div className="login-card-body" style={{ padding: '28px 36px 36px' }}>
           {error && (
             <div className="alert alert-danger" style={{ background: 'var(--paper-raised)', color: 'var(--oxblood)', marginBottom: 20 }}>
               {error}
@@ -442,7 +442,7 @@ export default function Login({ onLoginSuccess }) {
               Instant Evaluation Access
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+            <div className="login-demo-grid">
               <button
                 type="button"
                 className="btn btn-secondary btn-sm"

@@ -174,7 +174,7 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
       </div>
 
       {/* Middle Grid: Charts (Status & Categories) */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 24, marginBottom: 28 }}>
+      <div className="dashboard-two-col-grid">
         {/* Status Distribution */}
         <div className="card">
           <div className="card-header">
@@ -209,7 +209,7 @@ export default function AdminDashboard({ onSelectTicket, onNavigate }) {
       </div>
 
       {/* Two Column Section: Staff Workload & Overdue Escalations */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: 24, marginBottom: 28 }}>
+      <div className="dashboard-two-col-grid">
         {/* Staff Workload */}
         <div className="card">
           <div className="card-header">

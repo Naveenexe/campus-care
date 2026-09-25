@@ -112,7 +112,7 @@ export default function StaffDashboard({ user, onSelectTicket, onNavigate }) {
       </div>
 
       {/* Two Column: Overdue Urgencies & Approaching Deadlines */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: 24, marginBottom: 28 }}>
+      <div className="dashboard-two-col-grid">
         {/* Overdue */}
         <div className="card">
           <div className="card-header">

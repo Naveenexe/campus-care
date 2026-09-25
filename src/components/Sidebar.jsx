@@ -7,9 +7,11 @@ import {
   BarChart3,
   Settings,
   FolderKanban,
+  X,
+  Landmark,
 } from 'lucide-react';
 
-export default function Sidebar({ currentView, setView, role }) {
+export default function Sidebar({ currentView, setView, role, mobileNavOpen, onCloseMobile }) {
   const getNavSections = () => {
     if (role === 'admin') {
       return [
@@ -59,7 +61,24 @@ export default function Sidebar({ currentView, setView, role }) {
   const sections = getNavSections();
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${mobileNavOpen ? 'mobile-open' : ''}`}>
+      {/* Mobile Drawer Top Bar with Close button */}
+      <div className="sidebar-mobile-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Landmark size={18} color="var(--brass-soft)" />
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '1.05rem', color: 'var(--paper)' }}>
+            Registrar's Desk
+          </span>
+        </div>
+        <button
+          className="sidebar-close-btn"
+          onClick={onCloseMobile}
+          aria-label="Close navigation drawer"
+        >
+          <X size={18} />
+        </button>
+      </div>
+
       <div className="sidebar-nav">
         {sections.map((section, idx) => (
           <div key={idx} style={{ marginBottom: 16 }}>
@@ -74,7 +93,10 @@ export default function Sidebar({ currentView, setView, role }) {
                 <button
                   key={item.id}
                   className={`sidebar-link ${isActive ? `active role-${role}` : ''}`}
-                  onClick={() => setView(item.id)}
+                  onClick={() => {
+                    setView(item.id);
+                    if (onCloseMobile) onCloseMobile();
+                  }}
                 >
                   <Icon size={17} strokeWidth={isActive ? 2.2 : 1.8} />
                   <span>{item.label}</span>

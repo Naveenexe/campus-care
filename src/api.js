@@ -174,12 +174,12 @@ export const api = {
 
   getTicket: async (id) => {
     if (isStaticDeployment) {
-      return { ticket: mockStore.getTicket(id, getStoredUser()) };
+      return mockStore.getTicket(id, getStoredUser());
     }
     try {
       return await request(`/tickets/${id}`);
     } catch (err) {
-      return { ticket: mockStore.getTicket(id, getStoredUser()) };
+      return mockStore.getTicket(id, getStoredUser());
     }
   },
 
@@ -450,12 +450,12 @@ export const api = {
   // Notifications
   getNotifications: async () => {
     if (isStaticDeployment) {
-      return { notifications: mockStore.getNotifications(getStoredUser()) };
+      return mockStore.getNotifications(getStoredUser());
     }
     try {
       return await request('/notifications');
     } catch (err) {
-      return { notifications: mockStore.getNotifications(getStoredUser()) };
+      return mockStore.getNotifications(getStoredUser());
     }
   },
 

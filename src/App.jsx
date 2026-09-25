@@ -173,16 +173,28 @@ export default function App() {
     }
   };
 
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
   return (
     <div className="app-container">
       <div className="grain-overlay" aria-hidden="true" />
+      {mobileNavOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setMobileNavOpen(false)}
+          aria-hidden="true"
+        />
+      )}
       <Sidebar
         currentView={currentView}
         setView={(v) => {
           setSelectedTicketId(null);
           setCurrentView(v);
+          setMobileNavOpen(false);
         }}
         role={user.role}
+        mobileNavOpen={mobileNavOpen}
+        onCloseMobile={() => setMobileNavOpen(false)}
       />
 
       <div className="main-content">
@@ -191,6 +203,7 @@ export default function App() {
           onLogout={handleLogout}
           onSwitchUser={handleSwitchUser}
           onSelectTicket={handleSelectTicket}
+          onToggleMobileNav={() => setMobileNavOpen(!mobileNavOpen)}
         />
 
         <main className="content-body">

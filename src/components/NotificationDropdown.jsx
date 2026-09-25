@@ -118,6 +118,7 @@ export default function NotificationDropdown({ onSelectTicket }) {
           top: 'calc(100% + 8px)',
           right: 0,
           width: 340,
+          maxWidth: 'calc(100vw - 24px)',
           background: 'var(--paper-raised)',
           borderRadius: 'var(--radius-modal)',
           boxShadow: 'var(--shadow-offset-lg)',

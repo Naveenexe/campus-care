@@ -311,7 +311,7 @@ export default function TicketDetails({ ticketId, user, onBack }) {
       </div>
 
       {/* Main Grid: Details + Thread on Left, Meta Cards on Right */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.8fr) minmax(280px, 1fr)', gap: 24 }}>
+      <div className="ticket-detail-grid">
         {/* Left Column: Inquiry card and Thread */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
           {/* Main Inquiry Card */}

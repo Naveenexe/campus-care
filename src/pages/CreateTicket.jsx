@@ -154,7 +154,7 @@ export default function CreateTicket({ onTicketCreated, onCancel }) {
           {/* Priority Selection */}
           <div className="form-group">
             <label className="form-label">Urgency Level</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+            <div className="urgency-selector-grid">
               {[
                 { id: 'low', label: 'Low', desc: 'Standard query' },
                 { id: 'medium', label: 'Medium', desc: 'Routine inquiry' },

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Landmark, LogOut, ChevronDown, Check } from 'lucide-react';
+import { Landmark, LogOut, ChevronDown, Check, Menu } from 'lucide-react';
 import NotificationDropdown from './NotificationDropdown';
 import { api } from '../api';
 
-export default function Navbar({ user, onLogout, onSwitchUser, onSelectTicket }) {
+export default function Navbar({ user, onLogout, onSwitchUser, onSelectTicket, onToggleMobileNav }) {
   const [demoAccounts, setDemoAccounts] = useState([]);
   const [showDemoMenu, setShowDemoMenu] = useState(false);
 
@@ -36,6 +36,15 @@ export default function Navbar({ user, onLogout, onSwitchUser, onSelectTicket })
   return (
     <header className="navbar">
       <div className="navbar-brand">
+        <button
+          className="mobile-menu-btn"
+          onClick={onToggleMobileNav}
+          aria-label="Toggle navigation drawer"
+          title="Open drawer menu"
+        >
+          <Menu size={20} />
+        </button>
+
         <div className="brand-icon-box">
           <Landmark size={20} strokeWidth={2} />
         </div>
@@ -50,10 +59,11 @@ export default function Navbar({ user, onLogout, onSwitchUser, onSelectTicket })
         <div style={{ position: 'relative' }}>
           <button
             onClick={() => setShowDemoMenu(!showDemoMenu)}
-            className="btn btn-secondary btn-sm"
+            className="btn btn-secondary btn-sm switch-role-btn"
             style={{ borderRadius: 'var(--radius-input)', fontSize: '0.8rem' }}
           >
-            <span>Switch Role / User</span>
+            <span className="switch-role-full">Switch Role / User</span>
+            <span className="switch-role-short">Switch</span>
             <ChevronDown size={14} />
           </button>
 
@@ -63,6 +73,7 @@ export default function Navbar({ user, onLogout, onSwitchUser, onSelectTicket })
               top: 'calc(100% + 6px)',
               right: 0,
               width: 280,
+              maxWidth: 'calc(100vw - 24px)',
               maxHeight: 340,
               overflowY: 'auto',
               background: 'var(--paper-raised)',

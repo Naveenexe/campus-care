@@ -2,7 +2,7 @@
 // Enables 100% full-functionality interactive demos when deployed on static hosts like Netlify
 // Mirrors SQLite database schemas and API operations in browser localStorage
 
-const STORAGE_KEY = 'campuscare_offline_db_v1';
+const STORAGE_KEY = 'campuscare_registrar_db_v2026';
 
 const INITIAL_DEPARTMENTS = [
   { id: 1, name: 'Accounts & Finance', description: 'Handles fee payments, scholarship disbursements, and refunds' },
@@ -13,12 +13,12 @@ const INITIAL_DEPARTMENTS = [
 ];
 
 const INITIAL_CATEGORIES = [
-  { id: 1, name: 'Fees and Payments', description: 'Tuition installments, payment receipt discrepancies, refund requests', department_id: 1 },
-  { id: 2, name: 'Attendance', description: 'Attendance shortage appeals, medical leave approval, biometric issues', department_id: 2 },
-  { id: 3, name: 'ID Cards', description: 'Lost student card replacement, smart chip issues, new card requests', department_id: 3 },
-  { id: 4, name: 'Documents and Certificates', description: 'Bonafide certificates, transfer certificates, transcripts, mark sheets', department_id: 2 },
-  { id: 5, name: 'Technical Support', description: 'Portal login lockouts, ERP errors, campus Wi-Fi credentials', department_id: 4 },
-  { id: 6, name: 'General Administration', description: 'Hostel maintenance, cafeteria feedback, library membership', department_id: 5 },
+  { id: 1, name: 'Fees and Payments', description: 'Tuition installments, payment receipt discrepancies, refund requests', department_id: 1, department_name: 'Accounts & Finance' },
+  { id: 2, name: 'Attendance', description: 'Attendance shortage appeals, medical leave approval, biometric issues', department_id: 2, department_name: 'Academic Affairs' },
+  { id: 3, name: 'ID Cards', description: 'Lost student card replacement, smart chip issues, new card requests', department_id: 3, department_name: 'Student Services & Registry' },
+  { id: 4, name: 'Documents and Certificates', description: 'Bonafide certificates, transfer certificates, transcripts, mark sheets', department_id: 2, department_name: 'Academic Affairs' },
+  { id: 5, name: 'Technical Support', description: 'Portal login lockouts, ERP errors, campus Wi-Fi credentials', department_id: 4, department_name: 'IT Support' },
+  { id: 6, name: 'General Administration', description: 'Hostel maintenance, cafeteria feedback, library membership', department_id: 5, department_name: 'General Administration' },
 ];
 
 const INITIAL_SLA_POLICIES = [
@@ -60,8 +60,8 @@ function generateSeedTickets() {
     { id: 5, num: 'CC-2026-00105', req: 11, staff: 4, dept: 3, cat: 4, subject: 'Request for official sealed transcripts for German university application', desc: 'Need 3 copies of official transcript with registrar seal for DAAD scholarship application deadline.', prio: 'medium', stat: 'waiting_for_student', next: 'student', ageDays: 3, respDueMins: 480, resDueMins: 2880, responded: true, comments: [{ author: 4, vis: 'public', text: 'Please provide the exact postal address and recipient faculty name for international dispatch.' }] },
     { id: 6, num: 'CC-2026-00106', req: 12, staff: 2, dept: 1, cat: 1, subject: 'Merit-cum-means scholarship credit adjustment', desc: 'Sanction letter received from State Directorate but scholarship deduction not reflected on fee portal.', prio: 'medium', stat: 'resolved', next: 'student', ageDays: 5, respDueMins: 480, resDueMins: 2880, responded: true, resolved: true, resolutionSummary: 'Verified sanction order #SCH-2026-981. Credit voucher applied.', comments: [{ author: 2, vis: 'public', text: 'The scholarship adjustment voucher has been posted to your ledger.' }] },
     { id: 7, num: 'CC-2026-00107', req: 13, staff: 6, dept: 5, cat: 6, subject: 'Digital library remote VPN access renewal', desc: 'Remote access credentials for IEEE and Springer digital library expired on 28th Feb.', prio: 'low', stat: 'closed', next: 'student', ageDays: 9, respDueMins: 1440, resDueMins: 4320, responded: true, resolved: true, closed: true, resolutionSummary: 'Renewed LDAP credentials.', comments: [{ author: 6, vis: 'public', text: 'Credentials updated. You can login with your campus email.' }] },
-    { id: 8, num: 'CC-2026-00108', req: 14, staff: null, dept: 5, cat: 6, subject: 'Cafeteria smart balance not updated after UPI payment', desc: 'Paid INR 1500 via GPay at central mess kiosk. Balance still shows zero.', prio: 'low', stat: 'open', next: 'manager', ageDays: 0.2, respDueMins: 1440, resDueMins: 4320, comments: [] },
-    { id: 9, num: 'CC-2026-00109', req: 15, staff: null, dept: 4, cat: 5, subject: 'Hostel Block C 3rd floor Wi-Fi access point offline', desc: 'No SSID broadcasting since 8 AM today in rooms 301 to 318.', prio: 'medium', stat: 'open', next: 'manager', ageDays: 0.4, respDueMins: 480, resDueMins: 2880, comments: [] },
+    { id: 8, num: 'CC-2026-00108', req: 14, staff: null, dept: 5, cat: 6, subject: 'Cafeteria smart balance not updated after UPI payment', desc: 'Paid INR 1500 via GPay at central mess kiosk. Balance still shows zero.', prio: 'low', stat: 'open', next: 'staff', ageDays: 0.2, respDueMins: 1440, resDueMins: 4320, comments: [] },
+    { id: 9, num: 'CC-2026-00109', req: 15, staff: null, dept: 4, cat: 5, subject: 'Hostel Block C 3rd floor Wi-Fi access point offline', desc: 'No SSID broadcasting since 8 AM today in rooms 301 to 318.', prio: 'medium', stat: 'open', next: 'staff', ageDays: 0.4, respDueMins: 480, resDueMins: 2880, comments: [] },
     { id: 10, num: 'CC-2026-00110', req: 16, staff: 3, dept: 2, cat: 2, subject: 'Hall ticket download blocked due to incorrect fee dues flag', desc: 'Portal shows fee pending flag, but all dues were cleared on Jan 15th. Exam is tomorrow at 9 AM.', prio: 'urgent', stat: 'in_progress', next: 'staff', ageDays: 0.1, respDueMins: 30, resDueMins: 240, responded: true, comments: [{ author: 3, vis: 'public', text: 'Flag cleared manually in examination database. Please re-download.' }] },
     { id: 11, num: 'CC-2026-00111', req: 7, staff: 2, dept: 1, cat: 1, subject: 'Hostel fee security deposit refund on semester withdrawal', desc: 'Vacated hostel on Feb 1st, clearance form signed by warden. Security refund pending.', prio: 'medium', stat: 'in_progress', next: 'staff', ageDays: 6, respDueMins: 480, resDueMins: 2880, overdue: true, responded: true, comments: [] },
     { id: 12, num: 'CC-2026-00112', req: 8, staff: 4, dept: 3, cat: 3, subject: 'Typo in student name on ID card chip data', desc: 'Name printed as Ananya Iyre instead of Ananya Iyer. Library scanner rejects the card.', prio: 'low', stat: 'resolved', next: 'student', ageDays: 8, respDueMins: 1440, resDueMins: 4320, responded: true, resolved: true, resolutionSummary: 'Card re-encoded and reprinted.', comments: [] },
@@ -73,10 +73,10 @@ function generateSeedTickets() {
     { id: 18, num: 'CC-2026-00118', req: 14, staff: 6, dept: 5, cat: 6, subject: 'Hostel mess food quality grievance and cleanliness', desc: 'Repeated cold food served during dinner in Girls Hostel 2. Hygiene audit requested.', prio: 'medium', stat: 'in_progress', next: 'staff', ageDays: 1.2, respDueMins: 480, resDueMins: 2880, responded: true, comments: [] },
     { id: 19, num: 'CC-2026-00119', req: 15, staff: 4, dept: 3, cat: 3, subject: 'Damaged barcode on ID card prevents book issue at Central Library', desc: 'Lamination peeling off barcode strip. Library barcode scanner cannot read.', prio: 'low', stat: 'closed', next: 'student', ageDays: 14, respDueMins: 1440, resDueMins: 4320, responded: true, resolved: true, closed: true, resolutionSummary: 'Free re-lamination done.', comments: [] },
     { id: 20, num: 'CC-2026-00120', req: 16, staff: 2, dept: 1, cat: 1, subject: 'Tuition installment plan request due to family medical emergency', desc: 'Requesting permission to pay remaining 50% tuition in two installments in April and May.', prio: 'high', stat: 'in_progress', next: 'staff', ageDays: 0.8, respDueMins: 120, resDueMins: 1440, responded: true, comments: [] },
-    { id: 21, num: 'CC-2026-00121', req: 7, staff: null, dept: 3, cat: 4, subject: 'Migration certificate required for foreign internship registration', desc: 'Need university migration clearance for MITACS Globalink research internship.', prio: 'medium', stat: 'open', next: 'manager', ageDays: 0.6, respDueMins: 480, resDueMins: 2880, comments: [] },
+    { id: 21, num: 'CC-2026-00121', req: 7, staff: null, dept: 3, cat: 4, subject: 'Migration certificate required for foreign internship registration', desc: 'Need university migration clearance for MITACS Globalink research internship.', prio: 'medium', stat: 'open', next: 'staff', ageDays: 0.6, respDueMins: 480, resDueMins: 2880, comments: [] },
     { id: 22, num: 'CC-2026-00122', req: 8, staff: 3, dept: 2, cat: 2, subject: 'Clash between elective subjects in final exam timetable', desc: 'Machine Learning and Cloud Computing scheduled at the same time on March 28th 2 PM.', prio: 'urgent', stat: 'resolved', next: 'student', ageDays: 2, respDueMins: 30, resDueMins: 240, responded: true, resolved: true, resolutionSummary: 'CS409 moved to March 29th morning slot.', comments: [] },
     { id: 23, num: 'CC-2026-00123', req: 9, staff: 5, dept: 4, cat: 5, subject: 'Campus email inbox quota exceeded - not receiving placement emails', desc: 'Campus mailbox @student.edu bounced company invite because storage is full (5GB limit).', prio: 'urgent', stat: 'in_progress', next: 'staff', ageDays: 0.2, respDueMins: 30, resDueMins: 240, responded: true, comments: [] },
-    { id: 24, num: 'CC-2026-00124', req: 10, staff: null, dept: 5, cat: 6, subject: 'Campus shuttle bus route 3 timings irregularity in morning', desc: 'Morning 8:15 AM bus from Metro station consistently arriving 30 minutes late.', prio: 'low', stat: 'open', next: 'manager', ageDays: 3.2, respDueMins: 1440, resDueMins: 4320, overdue: true, comments: [] },
+    { id: 24, num: 'CC-2026-00124', req: 10, staff: null, dept: 5, cat: 6, subject: 'Campus shuttle bus route 3 timings irregularity in morning', desc: 'Morning 8:15 AM bus from Metro station consistently arriving 30 minutes late.', prio: 'low', stat: 'open', next: 'staff', ageDays: 3.2, respDueMins: 1440, resDueMins: 4320, overdue: true, comments: [] },
     { id: 25, num: 'CC-2026-00125', req: 11, staff: 4, dept: 3, cat: 4, subject: 'Medium of instruction English proficiency certificate for IELTS waiver', desc: 'Applying for Masters abroad, university requires formal letter.', prio: 'medium', stat: 'resolved', next: 'student', ageDays: 5, respDueMins: 480, resDueMins: 2880, responded: true, resolved: true, resolutionSummary: 'Issued official English Medium of Instruction letter.', comments: [] },
     { id: 26, num: 'CC-2026-00126', req: 12, staff: 2, dept: 1, cat: 1, subject: 'Tax exemption certificate (Section 80E) for father education loan', desc: 'Need 80E interest and tuition fee break-up certificate for income tax return filing.', prio: 'low', stat: 'waiting_for_student', next: 'student', ageDays: 4, respDueMins: 1440, resDueMins: 4320, responded: true, comments: [] },
     { id: 27, num: 'CC-2026-00127', req: 13, staff: 3, dept: 2, cat: 2, subject: 'Re-evaluation score update missing on web transcript', desc: 'Re-evaluation result of Engineering Mathematics III improved grade from C to A, but portal still lists C.', prio: 'high', stat: 'in_progress', next: 'staff', ageDays: 1.8, respDueMins: 120, resDueMins: 1440, overdue: true, responded: true, comments: [] },
@@ -141,7 +141,7 @@ function generateSeedTickets() {
       action_type: 'created',
       old_value: null,
       new_value: 'open',
-      description: `Ticket submitted by student #${t.req}`,
+      description: `Inquiry registered by student`,
       created_at: createdAt,
     });
 
@@ -153,7 +153,7 @@ function generateSeedTickets() {
         action_type: 'assigned',
         old_value: 'Unassigned',
         new_value: `Staff #${t.staff}`,
-        description: `Ticket assigned to Staff #${t.staff}`,
+        description: `Assigned to support staff officer`,
         created_at: new Date(createdTime + 10 * 60 * 1000).toISOString(),
       });
     }
@@ -204,117 +204,153 @@ class MockStore {
         this.comments = parsed.comments || [];
         this.history = parsed.history || [];
         this.notifications = parsed.notifications || [];
-        return;
+        if (this.tickets.length === 0) {
+          this.seedInitial();
+        }
+      } else {
+        this.seedInitial();
       }
     } catch (e) {
-      console.warn('Failed to parse mock store from localStorage, resetting', e);
+      this.seedInitial();
     }
-
-    this.reset();
   }
 
-  reset() {
-    this.departments = [...INITIAL_DEPARTMENTS];
-    this.categories = [...INITIAL_CATEGORIES];
-    this.slaPolicies = [...INITIAL_SLA_POLICIES];
-    this.users = [...INITIAL_USERS];
+  seedInitial() {
+    this.departments = INITIAL_DEPARTMENTS;
+    this.categories = INITIAL_CATEGORIES;
+    this.slaPolicies = INITIAL_SLA_POLICIES;
+    this.users = INITIAL_USERS;
 
     const { tickets, allComments, allHistory, notifications } = generateSeedTickets();
     this.tickets = tickets;
     this.comments = allComments;
     this.history = allHistory;
     this.notifications = notifications;
+
     this.save();
   }
 
   save() {
     try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          departments: this.departments,
-          categories: this.categories,
-          slaPolicies: this.slaPolicies,
-          users: this.users,
-          tickets: this.tickets,
-          comments: this.comments,
-          history: this.history,
-          notifications: this.notifications,
-        })
-      );
+      const payload = {
+        departments: this.departments,
+        categories: this.categories,
+        slaPolicies: this.slaPolicies,
+        users: this.users,
+        tickets: this.tickets,
+        comments: this.comments,
+        history: this.history,
+        notifications: this.notifications,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch (e) {
-      console.error('Failed to save to localStorage', e);
+      console.warn('LocalStorage save failed:', e);
     }
+  }
+
+  // --- Helpers ---
+  enrichTicket(t) {
+    const cat = this.categories.find((c) => c.id === t.category_id);
+    const dept = this.departments.find((d) => d.id === t.department_id);
+    const req = this.users.find((u) => u.id === t.requester_id);
+    const staff = this.users.find((u) => u.id === t.assigned_to_id);
+
+    const now = Date.now();
+    const isOverdue =
+      t.status !== 'resolved' &&
+      t.status !== 'closed' &&
+      t.resolution_due_at &&
+      new Date(t.resolution_due_at).getTime() < now;
+
+    const isApproaching =
+      !isOverdue &&
+      t.status !== 'resolved' &&
+      t.status !== 'closed' &&
+      t.resolution_due_at &&
+      new Date(t.resolution_due_at).getTime() - now < 4 * 60 * 60 * 1000;
+
+    let slaStatus = 'On Track';
+    if (t.status === 'resolved' || t.status === 'closed') {
+      slaStatus = 'Completed';
+    } else if (isOverdue) {
+      slaStatus = 'Overdue';
+    } else if (isApproaching) {
+      slaStatus = 'Approaching Deadline';
+    }
+
+    const commentCount = this.comments.filter((c) => c.ticket_id === t.id).length;
+
+    return {
+      ...t,
+      category_name: cat?.name || 'General',
+      department_name: dept?.name || 'General Records',
+      requester_name: req?.full_name || 'Student',
+      requester_email: req?.email || '',
+      requester_identifier: req?.student_or_employee_id || '',
+      assignee_name: staff?.full_name || null,
+      assignee_email: staff?.email || null,
+      assigned_to_name: staff?.full_name || null,
+      sla_status: slaStatus,
+      is_overdue: isOverdue,
+      is_approaching: isApproaching,
+      comment_count: commentCount,
+    };
   }
 
   // --- Auth ---
   login(email, password) {
-    const user = this.users.find((u) => u.email.toLowerCase() === (email || '').toLowerCase().trim());
-    if (!user) {
-      throw new Error('Invalid email or password');
-    }
-    // Accept Password@123 or any test password for simplicity in mock mode
-    return {
-      token: `mock_jwt_token_${user.id}_${Date.now()}`,
-      user: { ...user },
-    };
+    const user = this.users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (!user) throw new Error('Account record could not be found in the registry');
+    if (password !== 'Password@123') throw new Error('Invalid registry password');
+    return { token: `mock_token_${user.id}_${Date.now()}`, user };
   }
 
   demoLogin(email) {
-    const user = this.users.find((u) => u.email.toLowerCase() === (email || '').toLowerCase().trim());
-    if (!user) {
-      throw new Error('Demo account not found');
-    }
-    return {
-      token: `mock_jwt_token_${user.id}_${Date.now()}`,
-      user: { ...user },
-    };
+    const user = this.users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (!user) throw new Error('Demo account not found in registry');
+    return { token: `mock_token_${user.id}_${Date.now()}`, user };
   }
 
   getDemoAccounts() {
-    return [
-      { role: 'admin', label: 'Admin / Registrar', email: 'admin@campuscare.edu', name: 'Dr. Aris Thorne (Registrar)' },
-      { role: 'staff', label: 'Staff: Accounts', email: 'finance.staff@campuscare.edu', name: 'Prof. Ramesh Kulkarni' },
-      { role: 'staff', label: 'Staff: IT Support', email: 'it.staff@campuscare.edu', name: 'Kavita Menon' },
-      { role: 'student', label: 'Student: Rahul', email: 'rahul.sharma@student.edu', name: 'Rahul Sharma (CS)' },
-    ];
+    return this.users.map((u) => {
+      const dept = this.departments.find((d) => d.id === u.department_id);
+      return {
+        ...u,
+        department_name: dept?.name || null,
+      };
+    });
+  }
+
+  getCurrentUser(storedUser) {
+    if (!storedUser) return null;
+    return this.users.find((u) => u.id === storedUser.id) || storedUser;
   }
 
   register(userData) {
     const existing = this.users.find((u) => u.email.toLowerCase() === userData.email.toLowerCase());
-    if (existing) {
-      throw new Error('A user with this email already exists.');
-    }
+    if (existing) throw new Error('An institutional account with this email already exists in registry');
+
     const newUser = {
       id: this.users.length + 1,
       full_name: userData.full_name,
       email: userData.email,
       role: 'student',
       department_id: null,
-      student_or_employee_id: userData.student_id || `2026-STU-${Math.floor(100 + Math.random() * 900)}`,
+      student_or_employee_id: userData.student_id || `2024-REG-${this.users.length + 1}`,
       is_active: 1,
     };
     this.users.push(newUser);
     this.save();
-    return {
-      token: `mock_jwt_token_${newUser.id}_${Date.now()}`,
-      user: newUser,
-    };
-  }
-
-  getCurrentUser(currentUser) {
-    if (!currentUser) return null;
-    return this.users.find((u) => u.id === currentUser.id) || currentUser;
+    return { token: `mock_token_${newUser.id}_${Date.now()}`, user: newUser };
   }
 
   // --- Tickets ---
   getTickets(params = {}, currentUser = null) {
     let list = [...this.tickets];
 
-    // Filter by student if student role
     if (currentUser?.role === 'student') {
       list = list.filter((t) => t.requester_id === currentUser.id);
-    } else if (currentUser?.role === 'staff' && params.scope === 'mine') {
+    } else if (currentUser?.role === 'staff' && params.scope === 'assigned') {
       list = list.filter((t) => t.assigned_to_id === currentUser.id);
     }
 
@@ -330,11 +366,11 @@ class MockStore {
     if (params.department_id && params.department_id !== 'all') {
       list = list.filter((t) => String(t.department_id) === String(params.department_id));
     }
-    if (params.assigned_to) {
-      if (params.assigned_to === 'unassigned') {
+    if (params.assigned_to_id && params.assigned_to_id !== 'all') {
+      if (params.assigned_to_id === 'unassigned') {
         list = list.filter((t) => !t.assigned_to_id);
       } else {
-        list = list.filter((t) => String(t.assigned_to_id) === String(params.assigned_to));
+        list = list.filter((t) => String(t.assigned_to_id) === String(params.assigned_to_id));
       }
     }
     if (params.search) {
@@ -348,39 +384,45 @@ class MockStore {
     }
 
     // Sort
-    list.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-
-    // Enrich tickets with category_name, department_name, requester_name, assigned_to_name
-    const enriched = list.map((t) => {
-      const cat = this.categories.find((c) => c.id === t.category_id);
-      const dept = this.departments.find((d) => d.id === t.department_id);
-      const req = this.users.find((u) => u.id === t.requester_id);
-      const staff = this.users.find((u) => u.id === t.assigned_to_id);
-
-      const now = Date.now();
-      const isBreached =
-        t.status !== 'resolved' &&
-        t.status !== 'closed' &&
-        t.resolution_due_at &&
-        new Date(t.resolution_due_at).getTime() < now;
-
-      return {
-        ...t,
-        category_name: cat?.name || 'General',
-        department_name: dept?.name || 'Administration',
-        requester_name: req?.full_name || 'Student',
-        requester_email: req?.email || '',
-        assigned_to_name: staff?.full_name || null,
-        assigned_to_email: staff?.email || null,
-        is_sla_breached: isBreached,
-      };
+    const sortBy = params.sort_by || 'created_at';
+    const sortOrder = params.sort_order || 'desc';
+    list.sort((a, b) => {
+      const valA = a[sortBy] || '';
+      const valB = b[sortBy] || '';
+      if (sortOrder === 'asc') return valA > valB ? 1 : -1;
+      return valA < valB ? 1 : -1;
     });
 
+    const enriched = list.map((t) => this.enrichTicket(t));
+
+    // Filter by SLA state if requested
+    let finalTickets = enriched;
+    if (params.sla_state && params.sla_state !== 'all') {
+      if (params.sla_state === 'overdue') {
+        finalTickets = finalTickets.filter((t) => t.is_overdue);
+      } else if (params.sla_state === 'approaching') {
+        finalTickets = finalTickets.filter((t) => t.is_approaching);
+      } else if (params.sla_state === 'completed') {
+        finalTickets = finalTickets.filter((t) => t.sla_status === 'Completed');
+      } else if (params.sla_state === 'on_track') {
+        finalTickets = finalTickets.filter((t) => t.sla_status === 'On Track');
+      }
+    }
+
+    const page = parseInt(params.page, 10) || 1;
+    const limit = parseInt(params.limit, 10) || 12;
+    const total = finalTickets.length;
+    const totalPages = Math.ceil(total / limit) || 1;
+    const paginated = finalTickets.slice((page - 1) * limit, page * limit);
+
     return {
-      tickets: enriched,
-      total: enriched.length,
-      page: 1,
-      limit: 100,
+      tickets: paginated,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
     };
   }
 
@@ -388,10 +430,7 @@ class MockStore {
     const t = this.tickets.find((item) => String(item.id) === String(id));
     if (!t) throw new Error('Ticket not found');
 
-    const cat = this.categories.find((c) => c.id === t.category_id);
-    const dept = this.departments.find((d) => d.id === t.department_id);
-    const req = this.users.find((u) => u.id === t.requester_id);
-    const staff = this.users.find((u) => u.id === t.assigned_to_id);
+    const enriched = this.enrichTicket(t);
 
     // Comments
     let ticketComments = this.comments.filter((c) => c.ticket_id === t.id);
@@ -415,28 +454,13 @@ class MockStore {
         const actor = this.users.find((u) => u.id === h.actor_id);
         return {
           ...h,
-          actor_name: actor?.full_name || 'System',
+          actor_name: actor?.full_name || 'Registrar System',
           actor_role: actor?.role || 'system',
         };
       });
 
-    const now = Date.now();
-    const isBreached =
-      t.status !== 'resolved' &&
-      t.status !== 'closed' &&
-      t.resolution_due_at &&
-      new Date(t.resolution_due_at).getTime() < now;
-
     return {
-      ...t,
-      category_name: cat?.name || 'General',
-      department_name: dept?.name || 'Administration',
-      requester_name: req?.full_name || 'Student',
-      requester_email: req?.email || '',
-      requester_student_id: req?.student_or_employee_id || '',
-      assigned_to_name: staff?.full_name || null,
-      assigned_to_email: staff?.email || null,
-      is_sla_breached: isBreached,
+      ticket: enriched,
       comments: enrichedComments,
       history: ticketHistory,
     };
@@ -448,51 +472,48 @@ class MockStore {
     const prio = data.priority || 'medium';
     const policy = this.slaPolicies.find((p) => p.priority === prio) || { first_response_minutes: 480, resolution_minutes: 2880 };
 
-    const now = new Date();
-    const firstRespDue = new Date(now.getTime() + policy.first_response_minutes * 60 * 1000).toISOString();
-    const resDue = new Date(now.getTime() + policy.resolution_minutes * 60 * 1000).toISOString();
-
-    const newId = this.tickets.length > 0 ? Math.max(...this.tickets.map((t) => t.id)) + 1 : 1;
-    const ticketNumber = `CC-2026-${String(newId + 100).padStart(5, '0')}`;
+    const now = Date.now();
+    const id = this.tickets.length + 1;
+    const ticketNum = `CC-2026-${String(100 + id).padStart(5, '0')}`;
 
     const newTicket = {
-      id: newId,
-      ticket_number: ticketNumber,
+      id,
+      ticket_number: ticketNum,
       requester_id: currentUser ? currentUser.id : 7,
       assigned_to_id: null,
       department_id: deptId,
-      category_id: Number(data.category_id) || 1,
+      category_id: Number(data.category_id),
       subject: data.subject,
       description: data.description,
       priority: prio,
       status: 'open',
       resolution_summary: null,
-      next_action_owner: 'manager',
-      first_response_due_at: firstRespDue,
+      next_action_owner: 'staff',
+      first_response_due_at: new Date(now + policy.first_response_minutes * 60 * 1000).toISOString(),
       first_responded_at: null,
-      resolution_due_at: resDue,
+      resolution_due_at: new Date(now + policy.resolution_minutes * 60 * 1000).toISOString(),
       resolved_at: null,
       closed_at: null,
       reopen_count: 0,
-      created_at: now.toISOString(),
-      updated_at: now.toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     };
 
     this.tickets.unshift(newTicket);
 
     this.history.unshift({
       id: this.history.length + 1,
-      ticket_id: newId,
+      ticket_id: id,
       actor_id: currentUser ? currentUser.id : 7,
       action_type: 'created',
       old_value: null,
       new_value: 'open',
-      description: 'Ticket created',
-      created_at: now.toISOString(),
+      description: `Inquiry case lodged by student`,
+      created_at: new Date().toISOString(),
     });
 
     this.save();
-    return { id: newId, ticket_number: ticketNumber, ticket: newTicket };
+    return { success: true, ticket: this.enrichTicket(newTicket) };
   }
 
   updateStatus(id, status, resolutionSummary, currentUser) {
@@ -504,7 +525,7 @@ class MockStore {
     t.updated_at = new Date().toISOString();
 
     if (status === 'resolved') {
-      t.resolution_summary = resolutionSummary || 'Resolved by staff';
+      t.resolution_summary = resolutionSummary || 'Resolved by registrar staff';
       t.resolved_at = new Date().toISOString();
       t.next_action_owner = 'student';
     } else if (status === 'closed') {
@@ -523,12 +544,12 @@ class MockStore {
       action_type: 'status_change',
       old_value: oldStatus,
       new_value: status,
-      description: `Status changed from ${oldStatus} to ${status}${resolutionSummary ? `: ${resolutionSummary}` : ''}`,
+      description: `Status updated from ${oldStatus} to ${status}${resolutionSummary ? `: ${resolutionSummary}` : ''}`,
       created_at: new Date().toISOString(),
     });
 
     this.save();
-    return { success: true, ticket: t };
+    return { success: true, ticket: this.enrichTicket(t) };
   }
 
   assignTicket(id, staffId, currentUser) {
@@ -556,7 +577,7 @@ class MockStore {
     });
 
     this.save();
-    return { success: true, ticket: t };
+    return { success: true, ticket: this.enrichTicket(t) };
   }
 
   updatePriority(id, priority, currentUser) {
@@ -579,7 +600,7 @@ class MockStore {
     });
 
     this.save();
-    return { success: true, ticket: t };
+    return { success: true, ticket: this.enrichTicket(t) };
   }
 
   reopenTicket(id, reason, currentUser) {
@@ -606,7 +627,7 @@ class MockStore {
     });
 
     this.save();
-    return { success: true, ticket: t };
+    return { success: true, ticket: this.enrichTicket(t) };
   }
 
   addComment(ticketId, content, visibility, currentUser) {
@@ -637,111 +658,202 @@ class MockStore {
 
   // --- Dashboards ---
   getAdminDashboard() {
-    const now = Date.now();
-    const total = this.tickets.length;
-    const open = this.tickets.filter((t) => t.status === 'open').length;
-    const inProgress = this.tickets.filter((t) => t.status === 'in_progress' || t.status === 'waiting_for_student').length;
-    const resolved = this.tickets.filter((t) => t.status === 'resolved' || t.status === 'closed').length;
-    const slaBreached = this.tickets.filter(
-      (t) => t.status !== 'resolved' && t.status !== 'closed' && t.resolution_due_at && new Date(t.resolution_due_at).getTime() < now
-    ).length;
+    const enriched = this.tickets.map((t) => this.enrichTicket(t));
+    const total = enriched.length;
+    const openCount = enriched.filter((t) => t.status === 'open').length;
+    const inProgressCount = enriched.filter((t) => t.status === 'in_progress').length;
+    const waitingCount = enriched.filter((t) => t.status === 'waiting_for_student').length;
+    const resolvedCount = enriched.filter((t) => t.status === 'resolved').length;
+    const closedCount = enriched.filter((t) => t.status === 'closed').length;
+    const overdueCount = enriched.filter((t) => t.is_overdue).length;
+    const approachingCount = enriched.filter((t) => t.is_approaching).length;
+
+    // Staff Workload
+    const staffWorkload = this.users
+      .filter((u) => u.role === 'staff' && u.is_active === 1)
+      .map((s) => {
+        const dept = this.departments.find((d) => d.id === s.department_id);
+        const active = enriched.filter(
+          (t) => t.assigned_to_id === s.id && ['open', 'in_progress', 'waiting_for_student'].includes(t.status)
+        ).length;
+        const completed = enriched.filter(
+          (t) => t.assigned_to_id === s.id && ['resolved', 'closed'].includes(t.status)
+        ).length;
+        return {
+          id: s.id,
+          full_name: s.full_name,
+          department_name: dept?.name || 'General Records',
+          active_tickets: active,
+          completed_tickets: completed,
+        };
+      })
+      .sort((a, b) => b.active_tickets - a.active_tickets);
 
     // Categories
-    const catMap = {};
-    for (const c of this.categories) {
-      catMap[c.id] = { id: c.id, name: c.name, count: 0 };
-    }
-    for (const t of this.tickets) {
-      if (catMap[t.category_id]) catMap[t.category_id].count++;
+    const categoryCounts = {};
+    for (const t of enriched) {
+      const catName = t.category_name || 'General';
+      categoryCounts[catName] = (categoryCounts[catName] || 0) + 1;
     }
 
-    // Priorities
-    const priorities = { urgent: 0, high: 0, medium: 0, low: 0 };
-    for (const t of this.tickets) {
-      if (priorities[t.priority] !== undefined) priorities[t.priority]++;
+    // Status Breakdown
+    const statusBreakdown = {
+      open: openCount,
+      in_progress: inProgressCount,
+      waiting_for_student: waitingCount,
+      resolved: resolvedCount,
+      closed: closedCount,
+    };
+
+    // Priority Breakdown
+    const priorityBreakdown = {
+      urgent: enriched.filter((t) => t.priority === 'urgent').length,
+      high: enriched.filter((t) => t.priority === 'high').length,
+      medium: enriched.filter((t) => t.priority === 'medium').length,
+      low: enriched.filter((t) => t.priority === 'low').length,
+    };
+
+    // Ageing Bins
+    const activeTickets = enriched.filter((t) => ['open', 'in_progress', 'waiting_for_student'].includes(t.status));
+    const now = Date.now();
+    const ONE_DAY = 24 * 60 * 60 * 1000;
+    const ageingBins = {
+      under_24h: 0,
+      one_to_three_days: 0,
+      three_to_seven_days: 0,
+      over_seven_days: 0,
+    };
+    for (const t of activeTickets) {
+      const ageMs = now - new Date(t.created_at).getTime();
+      const ageDays = ageMs / ONE_DAY;
+      if (ageDays < 1) ageingBins.under_24h++;
+      else if (ageDays < 3) ageingBins.one_to_three_days++;
+      else if (ageDays < 7) ageingBins.three_to_seven_days++;
+      else ageingBins.over_seven_days++;
     }
 
-    // Recent
-    const recent = this.getTickets({ limit: 10 }).tickets.slice(0, 8);
+    // Overdue tickets
+    const overdueTickets = enriched.filter((t) => t.is_overdue).slice(0, 5);
 
-    const complianceRate = total > 0 ? Math.round(((total - slaBreached) / total) * 100) : 100;
+    // Recent activity
+    const recentActivity = this.history.slice(0, 8).map((h) => {
+      const ticket = this.tickets.find((t) => t.id === h.ticket_id);
+      const actor = this.users.find((u) => u.id === h.actor_id);
+      return {
+        id: h.id,
+        ticket_id: h.ticket_id,
+        ticket_number: ticket?.ticket_number || `CC-2026-${String(h.ticket_id).padStart(5, '0')}`,
+        actor_name: actor?.full_name || 'Registrar',
+        description: h.description,
+        created_at: h.created_at,
+      };
+    });
+
+    const complianceRate = total > 0 ? Math.round(((total - overdueCount) / total) * 100) : 100;
 
     return {
-      metrics: {
-        total_tickets: total,
-        open_tickets: open,
-        in_progress_tickets: inProgress,
-        resolved_tickets: resolved,
-        sla_breaches: slaBreached,
-        compliance_rate: complianceRate,
-        avg_resolution_hours: 18.4,
+      kpis: {
+        total,
+        open: openCount,
+        in_progress: inProgressCount,
+        waiting: waitingCount,
+        resolved: resolvedCount,
+        closed: closedCount,
+        overdue: overdueCount,
+        approaching: approachingCount,
+        sla_compliance_rate: complianceRate,
+        avg_resolution_hours: 18.2,
       },
-      categories: Object.values(catMap),
-      priorities,
-      recent_tickets: recent,
+      status_breakdown: statusBreakdown,
+      priority_breakdown: priorityBreakdown,
+      category_breakdown: categoryCounts,
+      staff_workload: staffWorkload,
+      ageing_bins: ageingBins,
+      overdue_tickets: overdueTickets,
+      recent_activity: recentActivity,
     };
   }
 
   getStaffDashboard(currentUser) {
     const staffId = currentUser?.id || 2;
-    const now = Date.now();
-    const myTickets = this.tickets.filter((t) => t.assigned_to_id === staffId);
-    const assignedCount = myTickets.filter((t) => t.status !== 'closed').length;
-    const overdueCount = myTickets.filter(
-      (t) => t.status !== 'resolved' && t.status !== 'closed' && t.resolution_due_at && new Date(t.resolution_due_at).getTime() < now
-    ).length;
-    const highPriorityCount = myTickets.filter(
-      (t) => (t.priority === 'urgent' || t.priority === 'high') && t.status !== 'closed'
-    ).length;
-    const resolvedCount = myTickets.filter((t) => t.status === 'resolved' || t.status === 'closed').length;
+    const enriched = this.tickets.map((t) => this.enrichTicket(t));
 
-    const recent = this.getTickets({ assigned_to: staffId }).tickets.slice(0, 8);
+    const myActiveTickets = enriched.filter(
+      (t) => t.assigned_to_id === staffId && ['open', 'in_progress', 'waiting_for_student'].includes(t.status)
+    );
+    const overdueTickets = myActiveTickets.filter((t) => t.is_overdue);
+    const approachingTickets = myActiveTickets.filter((t) => t.is_approaching);
+
+    const staffDeptId = currentUser?.department_id || 1;
+    const unassignedInDept = enriched.filter(
+      (t) => t.department_id === staffDeptId && !t.assigned_to_id && t.status === 'open'
+    );
 
     return {
-      metrics: {
-        assigned_tickets: assignedCount,
-        overdue_tickets: overdueCount,
-        high_priority_tickets: highPriorityCount,
-        resolved_tickets: resolvedCount,
+      kpis: {
+        active_pending: myActiveTickets.length,
+        overdue: overdueTickets.length,
+        approaching_sla: approachingTickets.length,
+        unassigned_in_department: unassignedInDept.length,
       },
-      recent_tickets: recent,
+      my_active_tickets: myActiveTickets,
+      overdue_tickets: overdueTickets,
+      approaching_tickets: approachingTickets,
+      unassigned_tickets: unassignedInDept,
     };
   }
 
   getStudentDashboard(currentUser) {
     const studentId = currentUser?.id || 7;
-    const myTickets = this.tickets.filter((t) => t.requester_id === studentId);
-    const totalCount = myTickets.length;
-    const activeCount = myTickets.filter((t) => t.status === 'open' || t.status === 'in_progress' || t.status === 'waiting_for_student').length;
-    const resolvedCount = myTickets.filter((t) => t.status === 'resolved' || t.status === 'closed').length;
-    const waitingActionCount = myTickets.filter((t) => t.status === 'waiting_for_student').length;
+    const enriched = this.tickets.map((t) => this.enrichTicket(t));
+    const studentTickets = enriched.filter((t) => t.requester_id === studentId);
 
-    const recent = this.getTickets({}, currentUser).tickets.slice(0, 8);
+    const activeCount = studentTickets.filter((t) =>
+      ['open', 'in_progress', 'waiting_for_student'].includes(t.status)
+    ).length;
+    const resolvedCount = studentTickets.filter((t) =>
+      ['resolved', 'closed'].includes(t.status)
+    ).length;
+    const waitingActionCount = studentTickets.filter((t) =>
+      t.status === 'waiting_for_student'
+    ).length;
 
     return {
-      metrics: {
-        total_tickets: totalCount,
-        active_tickets: activeCount,
-        resolved_tickets: resolvedCount,
-        action_required_tickets: waitingActionCount,
+      kpis: {
+        total: studentTickets.length,
+        active: activeCount,
+        waiting_for_you: waitingActionCount,
+        resolved: resolvedCount,
       },
-      recent_tickets: recent,
+      recent_tickets: studentTickets.slice(0, 8),
     };
   }
 
   // --- Staff Directory ---
   getStaff() {
+    const enriched = this.tickets.map((t) => this.enrichTicket(t));
     return this.users
       .filter((u) => u.role === 'staff' || u.role === 'admin')
       .map((s) => {
         const dept = this.departments.find((d) => d.id === s.department_id);
-        const activeCount = this.tickets.filter(
-          (t) => t.assigned_to_id === s.id && t.status !== 'resolved' && t.status !== 'closed'
+        const activeCount = enriched.filter(
+          (t) => t.assigned_to_id === s.id && ['open', 'in_progress', 'waiting_for_student'].includes(t.status)
+        ).length;
+        const resolvedCount = enriched.filter(
+          (t) => t.assigned_to_id === s.id && ['resolved', 'closed'].includes(t.status)
         ).length;
         return {
-          ...s,
-          department_name: dept?.name || 'General Administration',
-          active_tickets_count: activeCount,
+          id: s.id,
+          full_name: s.full_name,
+          email: s.email,
+          role: s.role,
+          department_id: s.department_id,
+          department_name: dept?.name || 'General Records',
+          student_or_employee_id: s.student_or_employee_id || `STF-${s.id}`,
+          active_tickets: activeCount,
+          active_workload: activeCount,
+          resolved_count: resolvedCount,
+          is_active: s.is_active !== 0 ? 1 : 0,
         };
       });
   }
@@ -750,7 +862,7 @@ class MockStore {
     const cat = this.categories.find((c) => c.id === Number(categoryId));
     const deptId = cat ? cat.department_id : null;
     const staffList = this.getStaff().filter((s) => (deptId ? s.department_id === deptId : true));
-    staffList.sort((a, b) => a.active_tickets_count - b.active_tickets_count);
+    staffList.sort((a, b) => a.active_workload - b.active_workload);
     return staffList[0] || null;
   }
 
@@ -791,6 +903,7 @@ class MockStore {
       name: data.name,
       description: data.description || '',
       department_id: Number(data.department_id) || 1,
+      is_active: 1,
     };
     this.categories.push(newCat);
     this.save();
@@ -821,31 +934,49 @@ class MockStore {
     return [...this.departments];
   }
 
+  createDepartment(data) {
+    const newDept = {
+      id: this.departments.length + 1,
+      name: data.name,
+      description: data.description || '',
+    };
+    this.departments.push(newDept);
+    this.save();
+    return newDept;
+  }
+
   // --- Reports & Analytics ---
   getAnalytics() {
-    const total = this.tickets.length;
-    const resolved = this.tickets.filter((t) => t.status === 'resolved' || t.status === 'closed').length;
-    const now = Date.now();
-    const breached = this.tickets.filter(
-      (t) => t.status !== 'resolved' && t.status !== 'closed' && t.resolution_due_at && new Date(t.resolution_due_at).getTime() < now
-    ).length;
+    const enriched = this.tickets.map((t) => this.enrichTicket(t));
+    const total = enriched.length;
+    const resolved = enriched.filter((t) => t.status === 'resolved' || t.status === 'closed').length;
+    const overdue = enriched.filter((t) => t.is_overdue).length;
 
-    const complianceRate = total > 0 ? Math.round(((total - breached) / total) * 100) : 100;
+    const complianceRate = total > 0 ? Math.round(((total - overdue) / total) * 100) : 100;
+
+    const priorities = ['urgent', 'high', 'medium', 'low'];
+    const priorityStats = {};
+    for (const p of priorities) {
+      const pTickets = enriched.filter((t) => t.priority === p);
+      const pResolved = pTickets.filter((t) => t.status === 'resolved' || t.status === 'closed').length;
+      const pOverdue = pTickets.filter((t) => t.is_overdue).length;
+      const pCompliance = pTickets.length > 0 ? Math.round(((pTickets.length - pOverdue) / pTickets.length) * 100) : 100;
+      priorityStats[p] = {
+        total: pTickets.length,
+        resolved: pResolved,
+        avg_hours: p === 'urgent' ? 3.2 : p === 'high' ? 14.5 : p === 'medium' ? 26.8 : 42.1,
+        compliance_rate: pCompliance,
+      };
+    }
 
     return {
       summary: {
         total_tickets: total,
         resolved_tickets: resolved,
         sla_compliance_rate: complianceRate,
-        avg_turnaround_hours: 16.8,
-        reopen_rate: '3.1%',
+        avg_resolution_hours: 18.2,
       },
-      priority_stats: {
-        urgent: { count: this.tickets.filter((t) => t.priority === 'urgent').length, compliance: '91%' },
-        high: { count: this.tickets.filter((t) => t.priority === 'high').length, compliance: '94%' },
-        medium: { count: this.tickets.filter((t) => t.priority === 'medium').length, compliance: '97%' },
-        low: { count: this.tickets.filter((t) => t.priority === 'low').length, compliance: '99%' },
-      },
+      priority_stats: priorityStats,
     };
   }
 
@@ -874,7 +1005,7 @@ class MockStore {
       `"${t.priority}"`,
       `"${t.status}"`,
       `"${t.requester_name}"`,
-      `"${t.assigned_to_name || 'Unassigned'}"`,
+      `"${t.assignee_name || 'Unassigned'}"`,
       `"${t.created_at}"`,
       `"${t.resolution_due_at || ''}"`,
       `"${t.resolved_at || ''}"`,
@@ -888,7 +1019,11 @@ class MockStore {
   // --- Notifications ---
   getNotifications(currentUser) {
     const userId = currentUser?.id || 1;
-    return this.notifications.filter((n) => n.user_id === userId);
+    const list = this.notifications.filter((n) => n.user_id === userId);
+    return {
+      notifications: list,
+      unreadCount: list.filter((n) => !n.is_read).length,
+    };
   }
 
   markNotificationRead(id) {
