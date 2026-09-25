@@ -18,6 +18,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState('dashboard');
   const [selectedTicketId, setSelectedTicketId] = useState(null);
   const [initializing, setInitializing] = useState(true);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   // Auto-authenticate on load
   useEffect(() => {
@@ -172,8 +173,6 @@ export default function App() {
         return <TicketList user={user} onSelectTicket={handleSelectTicket} onNavigate={setCurrentView} />;
     }
   };
-
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
     <div className="app-container">
